@@ -8,9 +8,14 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private Transform muzzlePoint;
     [SerializeField] private float bulletSpeed;
 
+    //References
+    EntityStats stats;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        stats = GetComponent<EntityStats>();
+
         PlayerController.OnShootPressed += Shoot;
     }
 
@@ -26,7 +31,7 @@ public class PlayerShooting : MonoBehaviour
         Rigidbody rb = newProj.GetComponent<Rigidbody>();
 
         rb.linearVelocity = transform.forward * bulletSpeed;
-        Destroy(newProj, 3);
+        newProj.GetComponent<Projectile>().SetDamage(stats.Damage);
     }
 
     void OnDestroy()

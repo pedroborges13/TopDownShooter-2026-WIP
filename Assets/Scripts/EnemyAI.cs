@@ -5,6 +5,7 @@ public class EnemyAI : MonoBehaviour
 {
     private NavMeshAgent agent;
     private Transform playerTransform;
+    private EntityStats stats;
 
     [SerializeField] private float updateInterval; //Interval to avoid overloading the CPU
 
@@ -12,6 +13,12 @@ public class EnemyAI : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        stats = GetComponent<EntityStats>();
+
+        if (stats != null && agent != null)
+        {
+            agent.speed = stats.MoveSpeed;
+        }
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         playerTransform = player.transform;

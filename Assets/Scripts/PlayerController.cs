@@ -4,10 +4,14 @@ using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed;
     [SerializeField] private CharacterController controller;
+    private float currentSpeed;
 
+    //Layer
     [SerializeField] private LayerMask groundLayer;
+
+    //References
+    EntityStats stats;
 
     //Events
     public static event Action OnShootPressed;
@@ -15,7 +19,8 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        stats = GetComponent<EntityStats>();
+        currentSpeed = stats.MoveSpeed;
     }
 
     // Update is called once per frame
@@ -37,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
         if (direction.magnitude >= 0.1f)
         {
-            controller.Move(direction * moveSpeed * Time.deltaTime);
+            controller.Move(direction * currentSpeed * Time.deltaTime);
         }
     }
 

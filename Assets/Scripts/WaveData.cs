@@ -22,9 +22,9 @@ public class EnemyGroup
 {
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private int count;
-    [SerializeField] private int spawnPoint;
+    //[SerializeField] private int spawnPoint;
 
     public GameObject EnemyPrefab => enemyPrefab;
     public int Count => count;
-    public int SpawnPoint => spawnPoint;
+    //public int SpawnPoint => spawnPoint;
 }

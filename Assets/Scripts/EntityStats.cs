@@ -75,7 +75,6 @@ public class EntityStats : MonoBehaviour
             }
             Death();
          }
-
     }
 
     void Death()

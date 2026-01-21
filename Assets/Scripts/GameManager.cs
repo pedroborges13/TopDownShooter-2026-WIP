@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviour
     public enum GameState { Prepatation, Combat, Paused, GameOver}
     public GameState currentState;
 
-    [SerializeField] private List<WaveData> waveTemplates;
     [SerializeField] private float defaultPrepTime = 60f;
     private float prepTime;
     private int currentWave = 1;
@@ -42,9 +41,7 @@ public class GameManager : MonoBehaviour
 
         currentState = GameState.Combat;
 
-        WaveData nextWave = waveTemplates[Random.Range(0, waveTemplates.Count)];
-
-        WaveManager.Instance.StartWave(nextWave, currentWave);
+        WaveManager.Instance.StartWave(currentWave);
         currentWave++;
     }
 

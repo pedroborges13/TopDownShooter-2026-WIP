@@ -1123,12 +1123,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f80aba5bf630d41ae05e71b55da5e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
+  database:
+    normalPrefab: {fileID: 8629934455430690940, guid: a3b70ef802257cd4bbfdab4bd07c56df, type: 3}
+    runnerPrefab: {fileID: 496291104163212751, guid: 73545ea0aa4a3604b89368b8a10c6954, type: 3}
+    bossPrefab: {fileID: 5196588045850992911, guid: e6a48653eae139f46ab435d64859e495, type: 3}
   spawnPoints:
   - {fileID: 2126510412}
   - {fileID: 275519453}
   - {fileID: 1777948042}
   - {fileID: 1294696081}
-  spawnRate: 0.5
+  spawnRate: 1
 --- !u!4 &731720178
 Transform:
   m_ObjectHideFlags: 0
@@ -1591,8 +1595,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GamaManager
   currentState: 0
-  waveTemplates:
-  - {fileID: 11400000, guid: 5b44390918322134497ac5fd674899a9, type: 2}
   defaultPrepTime: 60
 --- !u!4 &1682039876
 Transform:

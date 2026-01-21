@@ -7,25 +7,30 @@ using UnityEngine.Rendering;
 using static UnityEngine.EventSystems.EventTrigger;
 using Random = UnityEngine.Random;
 
-
+[Serializable]
+public class EnemyDatabase
+{
+    public GameObject normalPrefab;
+    public GameObject runnerPrefab;
+    public GameObject bossPrefab;
+}
 public class WaveManager : MonoBehaviour
 {
     public static WaveManager Instance { get; private set; }
 
-    [Header("Wave List")]
+    [Header("References")]
+    [SerializeField] private EnemyDatabase database;
     [SerializeField] private List<Transform> spawnPoints;
+
+    [Header("Settings")]
     [SerializeField] private float spawnRate;
+    private float spawnBetweenGroups;
+
+    //Control
     private float hpMod = 1f;
     private float speedMod = 1f;
     private int enemiesKilled;
     private int totalEnemies;
-    private int extraEnemies;
-    private int extraGroup;
-    //[SerializeField] private List<WaveData> waves;
-    //[SerializeField] private float timeBetweenWaves; //45 segundos ou apertar o botao de pular
-    //private int currentWave;
-    //private int enemiesAlive;
-    //private bool waveActive;
 
     //Events
     public event Action OnWaveStarted;
@@ -43,62 +48,85 @@ public class WaveManager : MonoBehaviour
         GlobalEvents.OnEnemyKilled += CheckWaveEnded;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartWave(int waveNumber)
     {
-        
-    }
-
-    public void StartWave(WaveData data, int waveNumber)
-    {
-        //A cada X waves, aumenta a dificuldade dos inimigos
+        //Every 5 waves, increase enemy health modifier
         if (waveNumber > 1 && waveNumber % 5 == 0)
         {
             hpMod += 0.4f;
-            speedMod += 0.2f;
         }
+
+        //Total groups (Base 2 + 1 every 3 rounds)
+        int totalGroups = 2 + Mathf.FloorToInt(waveNumber / 3f);
+
+        //Enemies per group (Base 5 + 2 every 4 rounds)
+        int enemiesPerGroup = 5 + (Mathf.FloorToInt(waveNumber / 4f) * 2);
+
+        //Runner enemy spawn chance starting at round 5
+        float runnerChance = 0f;
+        if(waveNumber > 5)
+        {
+            runnerChance = 0.5f;
+        }
+
+        //Calculate total enemies for the wave
+        totalEnemies = (totalGroups * enemiesPerGroup);
+        if (waveNumber % 5 == 0) totalEnemies += 1; //+1 do Boss
 
         enemiesKilled = 0;
-        totalEnemies = 0;
-        extraGroup = 0;
-        extraEnemies = (waveNumber - 1) * 2;
-        foreach (var group in data.Groups) totalEnemies += (group.Count + extraEnemies);
-        Debug.Log($"Total enemies: {totalEnemies} ExtraEnemies: {extraEnemies}");
 
-        StartCoroutine(SpawnRoutine(data));
+        Debug.Log($"Iniciando Wave {waveNumber}: {totalEnemies} inimigos totais.");
+        //OnWaveStarted?
+
+        StartCoroutine(SpawnProceduralRoutine(totalGroups, enemiesPerGroup, runnerChance, waveNumber));
     }
 
-    //Coroutine responsável pelo FLUXO e TEMPO da Wave
-    IEnumerator SpawnRoutine(WaveData data)
+   
+    IEnumerator SpawnProceduralRoutine(int totalGroups, int enemiesPerGroup, float runnerChance, int waveNumber)
     {
-        //Quantos groups tem em WaveData
-        foreach (var group in data.Groups)
+        //Loop through all groups
+        for (int g = 0; g < totalGroups; g++)
         {
-            //Sorteia um spawn aleatorio para o grupo nascer
-            int randomSpawnIndex = Random.Range(0, spawnPoints.Count);
+            int spawnIndex = Random.Range(0, spawnPoints.Count);
 
-            for (int i = 0; i < group.Count + extraEnemies; i++)
+            //Loop through all units inside the group
+            for (int i = 0; i < enemiesPerGroup; i++)
             {
-                SpawnEnemy(group.EnemyPrefab, randomSpawnIndex);
-                yield return new WaitForSeconds(spawnRate); //Intervalo de spawns entre inimigos do mesmo grupo
+                GameObject prefabToSpawn;
+
+                //Probability logic to choose between normal or runner
+                if (Random.value < runnerChance) prefabToSpawn = database.runnerPrefab;
+                else prefabToSpawn = database.normalPrefab;
+
+                SpawnEnemy(prefabToSpawn, spawnIndex);
+                yield return new WaitForSeconds(spawnRate);
             }
 
-            //Intervalo entre os grupos
-            yield return new WaitForSeconds(data.TimeBetweenGroups);
+            yield return new WaitForSeconds(spawnBetweenGroups);
         }
+
+        //Boss spawn logic (Every 5 rounds at the end of the wave???)
+        if (waveNumber % 5 == 0)
+        {
+            int bossIndex = Random.Range(0, spawnPoints.Count);
+            SpawnEnemy(database.bossPrefab, bossIndex); //Ver isso depois
+        }
+
     }
 
-    //Responsavel por instanciar e configurar os inimigos
+    //Responsible for instantiating and configuring enemies
     void SpawnEnemy(GameObject prefab, int pointIndex)
     {
+        if (prefab == null) return; 
+
         Transform selectedPoint = spawnPoints[pointIndex];
         GameObject enemy = Instantiate(prefab, selectedPoint.position, Quaternion.identity);
 
-        //Aplica buffs aos inimigos
-        if(enemy.TryGetComponent<EntityStats>(out EntityStats stats)) //TryGetComponent é melhor para performance, faz tudo em uma operacao só comparado ao GetComponent.
+        //Apply difficulty buffs via EntityStats
+        if (enemy.TryGetComponent<EntityStats>(out EntityStats stats)) //TryGetComponent é melhor para performance, faz tudo em uma operacao só comparado ao GetComponent.
         {
             stats.SetupEnemyStats(hpMod, speedMod); //Pega o metodo publico do EntityStats
-            Debug.Log($"HP {stats.MaxHp}, Velocidade {stats.MoveSpeed}");
+            Debug.Log($"HP {stats.MaxHp}, Velocidade {stats.MoveSpeed}"); //Ver o move speed depois
         }
     }
 
@@ -106,6 +134,7 @@ public class WaveManager : MonoBehaviour
     {
         enemiesKilled++;
         Debug.Log($"Enemies: {enemiesKilled} / {totalEnemies}");
+
         if(enemiesKilled >= totalEnemies)
         {
             OnWaveEnded?.Invoke();

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2533186140a6254e87e561330f348b0, type: 3}
-  m_Name: PlayerStats
+  m_Name: NormalEnemy
   m_EditorClassIdentifier: Assembly-CSharp::EntityStatsData
-  entityName: Player
-  maxHp: 10
-  moveSpeed: 4
+  entityName: NormalEnemy
+  maxHp: 6
+  moveSpeed: 1
   damage: 2

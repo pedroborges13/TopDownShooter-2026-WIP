@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f276f54a5c74734dbb1d30b24a028b3, type: 3}
+  m_Name: Uzi
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: Uzi
+  modelPrefab: {fileID: 0}
+  projectilePrefab: {fileID: 3917754564542185514, guid: 96119a04a9f1d9446bd717767a64bb8f, type: 3}
+  damage: 0.2
+  fireRateRPM: 600
+  knockbackForce: 0
+  projectileSpeed: 20
+  isAutomatic: 1

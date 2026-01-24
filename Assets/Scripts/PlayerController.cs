@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private CharacterController controller;
+    [SerializeField] private Weapon currentWeapon;
     private float currentSpeed;
 
     //Layer
@@ -73,9 +74,21 @@ public class PlayerController : MonoBehaviour
 
     void PlayerShootingInput()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (currentWeapon == null) return;
+
+        if (currentWeapon.IsAutomatic)
         {
-            OnShootPressed?.Invoke();
+            if (Input.GetMouseButton(0))
+            {
+                currentWeapon.TryShoot();
+            }
+        }
+        else
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                currentWeapon.TryShoot();
+            }
         }
     }
 }

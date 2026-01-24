@@ -1,16 +1,29 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
     public enum GameState { Prepatation, Combat, Paused, GameOver}
     public GameState currentState;
 
     [SerializeField] private float defaultPrepTime = 60f;
     private float prepTime;
-    private int currentWave = 1;
+    private int currentWave;
+
+
+    //Events
+    public event Action <GameState> OnGameStateChanged;
+    public event Action<int> OnWaveChanged;
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,6 +56,7 @@ public class GameManager : MonoBehaviour
 
         WaveManager.Instance.StartWave(currentWave);
         currentWave++;
+        OnWaveChanged?.Invoke(currentWave);
     }
 
     void EnterPreparationMode()

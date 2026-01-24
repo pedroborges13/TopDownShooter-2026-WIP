@@ -71,7 +71,7 @@ public class WaveManager : MonoBehaviour
 
         //Calculate total enemies for the wave
         totalEnemies = (totalGroups * enemiesPerGroup);
-        if (waveNumber % 5 == 0) totalEnemies += 1; //+1 do Boss
+        if (waveNumber > 1 && waveNumber % 5 == 0) totalEnemies += 1; //+1 do Boss
 
         enemiesKilled = 0;
 
@@ -106,7 +106,7 @@ public class WaveManager : MonoBehaviour
         }
 
         //Boss spawn logic (Every 5 rounds at the end of the wave???)
-        if (waveNumber % 5 == 0)
+        if (waveNumber > 1 && waveNumber % 5 == 0)
         {
             int bossIndex = Random.Range(0, spawnPoints.Count);
             SpawnEnemy(database.bossPrefab, bossIndex); //Ver isso depois

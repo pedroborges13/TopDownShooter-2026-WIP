@@ -31,7 +31,7 @@ public class PlayerShooting : MonoBehaviour
         Rigidbody rb = newProj.GetComponent<Rigidbody>();
 
         rb.linearVelocity = transform.forward * bulletSpeed;
-        newProj.GetComponent<Projectile>().SetDamage(stats.Damage);
+        //newProj.GetComponent<Projectile>().SetDamage(stats.Damage);
     }
 
     void OnDestroy()

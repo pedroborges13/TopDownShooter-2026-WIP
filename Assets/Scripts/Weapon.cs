@@ -16,6 +16,16 @@ public class Weapon : MonoBehaviour
 
     }
 
+    public void OnEquip()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void OnUnequip()
+    {
+        gameObject.SetActive(false);
+    }
+
     public void TryShoot()
     {
         if (Time.time >= fireTime)

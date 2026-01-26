@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private CharacterController controller;
-    [SerializeField] private Weapon currentWeapon;
+    //[SerializeField] private Weapon currentWeapon;
     private float currentSpeed;
 
     //Layer
@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     //References
     EntityStats stats;
+    Inventory inventory;
 
     //Events
     public static event Action OnShootPressed;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         stats = GetComponent<EntityStats>();
+        inventory = GetComponent<Inventory>();  
         currentSpeed = stats.MoveSpeed;
     }
 
@@ -30,6 +32,7 @@ public class PlayerController : MonoBehaviour
         PlayerMove();
         PlayerRotation();
         PlayerShootingInput();  
+        HandleWeaponInput();
     }
 
     void PlayerMove()
@@ -74,21 +77,37 @@ public class PlayerController : MonoBehaviour
 
     void PlayerShootingInput()
     {
-        if (currentWeapon == null) return;
+        Weapon activeWeapon = inventory.GetCurrentWeapon();
+        if (activeWeapon == null) return;
 
-        if (currentWeapon.IsAutomatic)
+        if (activeWeapon.IsAutomatic)
         {
             if (Input.GetMouseButton(0))
             {
-                currentWeapon.TryShoot();
+                activeWeapon.TryShoot();
             }
         }
         else
         {
             if (Input.GetMouseButtonDown(0))
             {
-                currentWeapon.TryShoot();
+                activeWeapon.TryShoot();
             }
         }
+    }
+
+    void HandleWeaponInput()
+    {
+        //Keys 1-4
+        if (Input.GetKeyDown(KeyCode.Alpha1)) inventory.EquipWeapon(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) inventory.EquipWeapon(1);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) inventory.EquipWeapon(2);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) inventory.EquipWeapon(3);
+
+        //Mouse scroll
+        float scroll = Input.GetAxis("Mouse ScrollWheel"); //Nome exato do eixo definido no InputManager
+        if (scroll > 0f) inventory.NextWeapon();
+        if (scroll < 0f) inventory.PreviousWeapon();
+
     }
 }

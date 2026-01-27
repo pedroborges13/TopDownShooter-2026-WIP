@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
         PlayerRotation();
         PlayerShootingInput();  
         HandleWeaponInput();
+        PauseGame();
     }
 
     void PlayerMove()
@@ -109,5 +110,13 @@ public class PlayerController : MonoBehaviour
         if (scroll > 0f) inventory.NextWeapon();
         if (scroll < 0f) inventory.PreviousWeapon();
 
+    }
+
+    void PauseGame()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameManager.Instance.TogglePause();
+        }
     }
 }

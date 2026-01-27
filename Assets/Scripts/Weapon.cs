@@ -16,6 +16,10 @@ public class Weapon : MonoBehaviour
 
     }
 
+    public int GetPrice()
+    {
+        return weaponData.Price;
+    }
     public void OnEquip()
     {
         gameObject.SetActive(true);

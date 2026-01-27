@@ -19,6 +19,7 @@ public class Inventory : MonoBehaviour
         //Equipa a pistola
         AddWeapon(pistolPrefab);
         EquipWeapon(0);
+        //Debug.Log(currentWeaponIndex);
     }
     
     void Start()

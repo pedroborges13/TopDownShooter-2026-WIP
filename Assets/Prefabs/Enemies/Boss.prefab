@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5823524687718056678}
   - component: {fileID: 4189355654738117997}
   - component: {fileID: 5511659249141629881}
+  - component: {fileID: -2400520799559466645}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Enemy
@@ -162,3 +163,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
   data: {fileID: 11400000, guid: 43d25256faece914ba0c4fd25289b0fe, type: 2}
+--- !u!114 &-2400520799559466645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5196588045850992911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea79631618cda984ca1dfd2b88cf4c17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDrop
+  moneyReward: 500

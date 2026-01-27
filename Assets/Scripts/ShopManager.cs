@@ -4,28 +4,25 @@ using UnityEngine;
 public class ShopManager : MonoBehaviour
 {   
     private Inventory inventory;
-    private EntityStats stats;
+    private PlayerWallet wallet;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         inventory = player.GetComponent<Inventory>();
-        stats = player.GetComponent<EntityStats>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        wallet = player.GetComponent<PlayerWallet>();
     }
 
     public void BuyWeapon(GameObject weaponPrefab)
     {
+        //Gets weapon cost value
         Weapon weaponScript = weaponPrefab.GetComponent<Weapon>();
+        int cost = weaponScript.GetPrice();
 
-        //int cost = weaponScript.GetPrice();
-
-        //if (playerStats.Money)
+        if (wallet.Money >= cost)
+        {
+            wallet.SpendMoney(cost);
+            inventory.AddWeapon(weaponPrefab);
+        }
     }
 }

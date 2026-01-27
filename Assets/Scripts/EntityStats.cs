@@ -31,19 +31,8 @@ public class EntityStats : MonoBehaviour
             maxHp = data.MaxHp;
             moveSpeed = data.MoveSpeed;
             CurrentHp = maxHp;
-            Debug.Log("EntityStats: Health: " + maxHp +  " Speed: " + moveSpeed + " CurrentHealth: " + CurrentHp);
+            //Debug.Log("EntityStats: Health: " + maxHp +  " Speed: " + moveSpeed + " CurrentHealth: " + CurrentHp);
         }
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }   
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void SetupEnemyStats(float hpMod, float speedMod)
@@ -72,6 +61,10 @@ public class EntityStats : MonoBehaviour
             if (CompareTag("Enemy"))
             {
                 GlobalEvents.OnEnemyKilled?.Invoke();
+                if (TryGetComponent<EnemyDrop>(out EnemyDrop drop))
+                {
+                    drop.DropReward();
+                }
             }
             Death();
          }

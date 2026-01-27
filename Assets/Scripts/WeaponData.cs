@@ -16,7 +16,7 @@ public class WeaponData : ScriptableObject
     [SerializeField] private float projectileSpeed;
     [SerializeField] private bool isAutomatic;
 
-    [SerializeField] private float price;
+    [SerializeField] private int price;
     //Visuals
     public string WeaponName => weaponName;
     public GameObject ModelPrefab => modelPrefab;
@@ -29,5 +29,5 @@ public class WeaponData : ScriptableObject
     public float ProjectileSpeed => projectileSpeed;
     public bool IsAutomatic => isAutomatic;
 
-    public float Price => price;
+    public int Price => price;
 }

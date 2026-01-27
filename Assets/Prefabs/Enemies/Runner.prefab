@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4726761280990813721}
   - component: {fileID: 8907467707560446631}
   - component: {fileID: 3051761803041619380}
+  - component: {fileID: -6839255211743941404}
   m_Layer: 0
   m_Name: Runner
   m_TagString: Enemy
@@ -162,3 +163,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
   data: {fileID: 11400000, guid: 43d25256faece914ba0c4fd25289b0fe, type: 2}
+--- !u!114 &-6839255211743941404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496291104163212751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea79631618cda984ca1dfd2b88cf4c17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDrop
+  moneyReward: 30

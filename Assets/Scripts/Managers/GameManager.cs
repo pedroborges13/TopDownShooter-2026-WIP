@@ -1,22 +1,20 @@
-using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-
+public enum GamePhase { Preparation, Combat }
+public enum GameStatus { Playing, Paused, GameOver }
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public enum GameState { Prepatation, Combat, Paused, GameOver}
-    public GameState currentState;
+    public GamePhase CurrentPhase { get; private set; }
+    public GameStatus CurrentStatus { get; private set; }
 
     [SerializeField] private float defaultPrepTime = 60f;
     private float prepTime;
     private int currentWave;
 
-
     //Events
-    public event Action <GameState> OnGameStateChanged;
+    public event Action <GamePhase> OnGamePhaseChanged;
+    public event Action <GameStatus> OnGameStatusChanged;
     public event Action<int> OnWaveChanged;
 
     void Awake()
@@ -29,8 +27,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         prepTime = defaultPrepTime;
-        currentState = GameState.Prepatation;
-        Debug.Log("GameState: " + currentState);
+        CurrentPhase = GamePhase.Preparation;
+        OnGamePhaseChanged?.Invoke(CurrentPhase);
+        Debug.Log($"GameState: {CurrentPhase}");    
 
         if (WaveManager.Instance != null)
         {
@@ -41,18 +40,24 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (currentState == GameState.Prepatation)
-        {
-            prepTime -= Time.deltaTime;
-            if (prepTime <= 0) StartWave();
-        }
+        if (CurrentStatus != GameStatus.Playing) return;
+
+        if (CurrentPhase == GamePhase.Preparation) PreparationTimer();
+    }
+
+    void PreparationTimer()
+    {
+        prepTime -= Time.deltaTime;
+        if (prepTime <= 0) StartWave();
     }
 
     public void StartWave() //UI button or timer
     {
-        if (currentState == GameState.Combat) return;
+        if (CurrentPhase == GamePhase.Combat) return;
 
-        currentState = GameState.Combat;
+        CurrentPhase = GamePhase.Combat;
+        OnGamePhaseChanged?.Invoke(CurrentPhase);
+        Debug.Log($"GameState: {CurrentPhase}");
 
         WaveManager.Instance.StartWave(currentWave);
         currentWave++;
@@ -61,13 +66,30 @@ public class GameManager : MonoBehaviour
 
     void EnterPreparationMode()
     {
-        Debug.Log("GameState: " + currentState);
-        currentState = GameState.Prepatation;
+        CurrentPhase = GamePhase.Preparation;
+        OnGamePhaseChanged?.Invoke(CurrentPhase);
+        Debug.Log($"GameState: {CurrentPhase}");
         prepTime = defaultPrepTime;
-        //Avisar UIManager mostrar botao e o timer
     }
 
+    public void TogglePause()
+    {
+        if (CurrentStatus == GameStatus.Paused) ResumeGame();
+        else PauseGame();
+    }
+    void PauseGame()
+    {
+        CurrentStatus = GameStatus.Paused;
+        Time.timeScale = 0;
+        OnGameStatusChanged?.Invoke(CurrentStatus);
+    }
 
+    void ResumeGame()
+    {
+        CurrentStatus = GameStatus.Playing;
+        Time.timeScale = 1;
+        OnGameStatusChanged?.Invoke(CurrentStatus);
+    }
     private void OnDisable()
     {
         if (WaveManager.Instance != null)

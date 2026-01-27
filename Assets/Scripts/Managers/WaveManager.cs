@@ -24,7 +24,7 @@ public class WaveManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private float spawnRate;
-    private float spawnBetweenGroups;
+    [SerializeField] private float spawnBetweenGroups;
 
     //Control
     private float hpMod = 1f;

@@ -33,11 +33,7 @@ public class Projectile : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            other.GetComponent<EntityStats>().TakeDamage(damage);
-
-            //Calculate the direction of the hit for the knockback
-            Vector3 hitDirection = (other.transform.position - transform.position).normalized;
-            hitDirection.y = 0;
+            other.GetComponent<EntityStats>().TakeDamage(damage, transform.forward, knockback);
 
             Destroy(gameObject);
         }

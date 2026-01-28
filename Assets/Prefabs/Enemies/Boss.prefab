@@ -149,7 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d03bd536294b37240b52ed70ad9d150d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  updateInterval: 0.1
+  friction: 8
+  updateInterval: 0.15
 --- !u!114 &5511659249141629881
 MonoBehaviour:
   m_ObjectHideFlags: 0

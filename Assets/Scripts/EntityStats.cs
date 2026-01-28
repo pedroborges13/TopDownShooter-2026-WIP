@@ -49,18 +49,24 @@ public class EntityStats : MonoBehaviour
             agent.speed = moveSpeed;
         }
     }
-    public void TakeDamage(float amount)
+    public void TakeDamage(float damage, Vector3 initialPosition = default, float kbForce = 0) //Default and 0 for when the player takes damage
     {
         if(IsDead) return;
 
-        CurrentHp -= amount;
+        CurrentHp -= damage;
         OnHealthChanged?.Invoke();
 
-         if(CurrentHp <= 0)
+        if(kbForce > 0 && TryGetComponent<EnemyAI>(out EnemyAI ai))
+        {
+            ai.ApplyKnockback(initialPosition, kbForce);
+        }
+
+         if (CurrentHp <= 0)
          {
-            if (CompareTag("Enemy"))
+            if(CompareTag("Enemy"))
             {
                 GlobalEvents.OnEnemyKilled?.Invoke();
+
                 if (TryGetComponent<EnemyDrop>(out EnemyDrop drop))
                 {
                     drop.DropReward();

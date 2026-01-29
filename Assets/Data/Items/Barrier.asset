@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79741e7074c003949b4751f1fbc55109, type: 3}
+  m_Name: Barrier
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  displayName: Barrier
+  cost: 50
+  prefab: {fileID: 9113172467910725948, guid: 2f4bec94dd89d8d4dbf8506292bffdc8, type: 3}
+  previewPrefab: {fileID: 8869239041365727139, guid: 1e9e8630642de814e9d2514fa09dfc08, type: 3}
+  size: {x: 1, y: 1}

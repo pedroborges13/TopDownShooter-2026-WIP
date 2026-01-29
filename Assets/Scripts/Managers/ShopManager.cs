@@ -2,7 +2,8 @@ using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class ShopManager : MonoBehaviour
-{   
+{
+    [SerializeField] private BuildingData itemData;
     private Inventory inventory;
     private PlayerWallet wallet;
 
@@ -24,5 +25,10 @@ public class ShopManager : MonoBehaviour
             wallet.SpendMoney(cost);
             inventory.AddWeapon(weaponPrefab);
         }
+    }
+
+    public void BuyItems()
+    {
+        BuildManager.Instance.SelectBuildingToPlace(itemData);
     }
 }

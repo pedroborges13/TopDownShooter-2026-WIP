@@ -4,27 +4,121 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
+    [Header("References")]
     private NavMeshAgent agent;
     private Transform playerTransform;
     private EntityStats stats;
-    private bool isKnockedback;
+
+    [Header("Enemy Settings")]
+    [SerializeField] private float attackRange;
+    [SerializeField] private float attackCooldown;
+    private bool isAttacking;
+
     [SerializeField] private float friction; //Adjustment for how quiclky the enemy stops
     [SerializeField] private float updateInterval; //Interval to avoid overloading the CPU
+    private float pathTimer;
 
+    //State
+    private bool isKnockedback;
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         stats = GetComponent<EntityStats>();
 
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null) playerTransform = player.transform;
+
+        //Stats do SO
         if (stats != null && agent != null)
         {
             agent.speed = stats.MoveSpeed;
+        } 
+    }
+
+    void Update()
+    {
+        if (isKnockedback || playerTransform != null) return;
+
+        //Timer para nao calcular rota todo update{
+        pathTimer += Time.deltaTime;
+        if (pathTimer >= updateInterval)
+        {
+            agent.SetDestination(playerTransform.position);
+            pathTimer = 0;
         }
 
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        playerTransform = player.transform;
+        if (agent.pathStatus == NavMeshPathStatus.PathPartial)
+        {
+            HandleBlockedPath();
+        }
+        else
+        {
+            HandleChasePath();
+        }
+    }
 
-        InvokeRepeating(nameof(UpdateDestination), 0f, updateInterval);
+    void HandleBlockedPath()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
+        bool barrierFound = false;
+
+        foreach (var hit in hitColliders)
+        {
+            if (CompareTag("Barrier"))
+            {
+                //Para de andar para bater
+                agent.isStopped = true;
+                AttemptAttack(hit.gameObject);
+                barrierFound = true;
+                break; //Foca em uma barreira por vez
+            }
+        }
+
+        if (!barrierFound)
+        {
+            agent.isStopped = false;
+        }
+    }
+
+    void HandleChasePath()
+    {
+        agent.isStopped = false;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+        if (distanceToPlayer <= agent.stoppingDistance)
+        {
+            AttemptAttack(playerTransform.gameObject);
+        }
+    }
+
+    void AttemptAttack(GameObject target)
+    {
+        if (!isAttacking)
+        {
+            StartCoroutine(AttackRoutine(target));
+        }
+    }
+
+    IEnumerator AttackRoutine(GameObject target)
+    {
+        isAttacking = true;
+        agent.isStopped = true;
+
+        if (target != null)
+        {
+            BarrierHealth targetHealth = target.GetComponent<BarrierHealth>();
+
+            if (targetHealth != null)
+            {
+                targetHealth.TakeDamage(stats.Damage);
+                //anim.SetTrigger("Attack")
+            }
+        }
+
+        yield return new WaitForSeconds(attackCooldown);
+        isAttacking = false;
+        agent.isStopped = false;
     }
 
     public void ApplyKnockback(Vector3 initialPosition, float force)
@@ -64,5 +158,11 @@ public class EnemyAI : MonoBehaviour
         {
             agent.SetDestination(playerTransform.position);
         }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,6 +19,12 @@ public class BuildManager : MonoBehaviour
     private GameObject ghostObject;
     private bool isBuildingMode;
 
+    //References
+    private PlayerWallet wallet;
+
+    //Events
+    public event Action<int> OnBuildingPlaced;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -27,6 +34,8 @@ public class BuildManager : MonoBehaviour
     void Start()
     {
         if(GameManager.Instance != null) GameManager.Instance.OnGamePhaseChanged += GamePhaseChanged;
+
+        wallet = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerWallet>();
     }
 
     void Update()
@@ -42,10 +51,15 @@ public class BuildManager : MonoBehaviour
         HandleBuildingPosition();
     }
 
+    public int GetPrice()
+    {
+        return selectedBuilding.Price;
+    }
+
     public void SelectBuildingToPlace(BuildingData data)
     {
-        if(selectedBuilding == data) return; //Item is already selected
-
+        if (selectedBuilding == data) return; //Item is already selected
+        //if(selectedBuilding.Price >= ) {
         CancelBuilding(); //Clears previous selection
 
         selectedBuilding = data;
@@ -68,23 +82,25 @@ public class BuildManager : MonoBehaviour
             Vector3 targetPosition = SnapToGrid(hit.point);
             ghostObject.transform.position = targetPosition;
 
-            //Check if the position is valid
-            bool isValid = IsValidPosition(targetPosition);
-            //Changes ghost colour in real time
-            UpdateGhostColor(isValid);
+            
+            bool isSpaceFree = IsValidPosition(targetPosition); //Check if the position is valid
+            bool hasMoney = wallet.Money >= selectedBuilding.Price; //Check if the position is valid           
+            bool canPlace = isSpaceFree && hasMoney;
+            UpdateGhostColor(canPlace); //Changes ghost colour in real time
 
             //Checks if clicking on UI (to avoid accidental building when clicking a button)
             if (EventSystem.current.IsPointerOverGameObject()) return;
 
             if (Input.GetMouseButtonDown(0))
             {
-                if (isValid)
+                if (canPlace)
                 {
                     PlaceBuilding(targetPosition);
                 }
                 else
                 {
-                    Debug.Log($"Local invalido");
+                    if (!hasMoney) Debug.Log($"Sem saldo");
+                    else if (!isSpaceFree) Debug.Log($"Local invalido");
                 }
             }
         }
@@ -120,6 +136,7 @@ public class BuildManager : MonoBehaviour
     void PlaceBuilding(Vector3 position)
     {
         Instantiate(selectedBuilding.Prefab, position, Quaternion.identity);
+        OnBuildingPlaced?.Invoke(selectedBuilding.Price);
         CancelBuilding();
     }
 
@@ -151,6 +168,27 @@ public class BuildManager : MonoBehaviour
     void GamePhaseChanged(GamePhase newPhase)
     {
         if (newPhase != GamePhase.Preparation) CancelBuilding();
+    }
+
+    void OnDrawGizmos()
+    {
+        // Só desenha se tiver um prédio selecionado para não poluir a tela
+        if (selectedBuilding == null || ghostObject == null) return;
+
+        // Usamos a mesma lógica de posição do seu IsValidPosition
+        float checkSize = gridSize * 0.9f;
+        Vector3 checkCenter = ghostObject.transform.position + Vector3.up * 0.5f;
+        Vector3 halfExtents = new Vector3(checkSize / 2, 0.45f, checkSize / 2);
+
+        // Define a cor do Gizmo (transparente para não tapar tudo)
+        Gizmos.color = Color.cyan;
+
+        // Desenha o contorno da caixa
+        Gizmos.DrawWireCube(checkCenter, halfExtents * 2); // Multiplicamos por 2 porque WireCube pede o tamanho total, não a metade
+
+        // Desenha a caixa sólida por dentro
+        Gizmos.color = new Color(0, 1, 1, 0.2f);
+        Gizmos.DrawCube(checkCenter, halfExtents * 2);
     }
 
     void OnDestroy()

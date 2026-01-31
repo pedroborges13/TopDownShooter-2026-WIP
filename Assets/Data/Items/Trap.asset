@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 79741e7074c003949b4751f1fbc55109, type: 3}
-  m_Name: Barrier
+  m_Name: Trap
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
-  displayName: Barrier
-  price: 50
-  prefab: {fileID: 9113172467910725948, guid: 2f4bec94dd89d8d4dbf8506292bffdc8, type: 3}
-  previewPrefab: {fileID: 8869239041365727139, guid: 1e9e8630642de814e9d2514fa09dfc08, type: 3}
+  displayName: Trap
+  price: 100
+  prefab: {fileID: 5373598484326349458, guid: 9bae838f9a0a8a5448f5eb33a50de958, type: 3}
+  previewPrefab: {fileID: 8825564589007492842, guid: 5f957b7282e08cd47b4888a50a8e8f24, type: 3}
   size: {x: 1, y: 1}

@@ -15,4 +15,4 @@ MonoBehaviour:
   entityName: NormalEnemy
   maxHp: 6
   moveSpeed: 1
-  damage: 2
+  damage: 1

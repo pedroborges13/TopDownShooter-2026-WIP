@@ -126,7 +126,7 @@ public class WaveManager : MonoBehaviour
         if (enemy.TryGetComponent<EntityStats>(out EntityStats stats)) //TryGetComponent é melhor para performance, faz tudo em uma operacao só comparado ao GetComponent.
         {
             stats.SetupEnemyStats(hpMod, speedMod); //Pega o metodo publico do EntityStats
-            Debug.Log($"HP {stats.MaxHp}, Velocidade {stats.MoveSpeed}"); //Ver o move speed depois
+            //Debug.Log($"HP {stats.MaxHp}, Velocidade {stats.MoveSpeed}");
         }
     }
 

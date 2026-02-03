@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4233808925010380572}
   - component: {fileID: 5891344368981584457}
   - component: {fileID: 5722537398846093311}
+  - component: {fileID: 829696738944853842}
   m_Layer: 3
   m_Name: Barrier
   m_TagString: Barrier
@@ -366,12 +367,25 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.375, y: 0.5, z: 0.35}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &829696738944853842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8850422037442102308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c65f9f66bf20be4a96d2321f43cd2d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarrierHealth
+  maxHp: 3
 --- !u!1 &9113172467910725948
 GameObject:
   m_ObjectHideFlags: 0

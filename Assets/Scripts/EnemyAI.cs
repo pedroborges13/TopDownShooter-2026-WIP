@@ -28,7 +28,7 @@ public class EnemyAI : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null) playerTransform = player.transform;
 
-        //Stats do SO
+        //Apply movement speed from SO/Stats to the NavMeshAgent
         if (stats != null && agent != null)
         {
             agent.speed = stats.MoveSpeed;
@@ -37,9 +37,11 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (isKnockedback || playerTransform != null) return;
+        if (isKnockedback || playerTransform == null) return;
 
-        //Timer para nao calcular rota todo update{
+        //Debug.Log($"Status: {agent.pathStatus} | Velocity: {agent.velocity.sqrMagnitude}");
+
+        //Optimization: Recalculate the path to the player only at specific intervals
         pathTimer += Time.deltaTime;
         if (pathTimer >= updateInterval)
         {
@@ -47,6 +49,11 @@ public class EnemyAI : MonoBehaviour
             pathTimer = 0;
         }
 
+        //If currently performing an attack animation/routine, skip movement logic
+        if (isAttacking) return;
+
+        //Path Status logic:
+        //Patial Path means the NavMesh is blocked (likely by a Barrier)
         if (agent.pathStatus == NavMeshPathStatus.PathPartial)
         {
             HandleBlockedPath();
@@ -57,41 +64,58 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Logic for when the enemy's path to the player is obstructed
+    /// It searches for objects like "Barrier" to destroy them
+    /// </summary>
     void HandleBlockedPath()
     {
+        Debug.Log("Caminho bloqueado, procurando barrier");
+
+        //Detect all coliders within the attack range
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
         bool barrierFound = false;
 
         foreach (var hit in hitColliders)
         {
-            if (CompareTag("Barrier"))
+            if (hit.CompareTag("Barrier"))
             {
-                //Para de andar para bater
-                agent.isStopped = true;
-                AttemptAttack(hit.gameObject);
-                barrierFound = true;
-                break; //Foca em uma barreira por vez
+            //Stop the agent to attack
+            agent.isStopped = true;
+            AttemptAttack(hit.gameObject);
+            barrierFound = true;
+            Debug.Log("Atacou a Barrier");
+            break; //Focus on one barrier at a time
             }
         }
 
+        //If no barries is nearby, resume movement
         if (!barrierFound)
         {
-            agent.isStopped = false;
+        agent.isStopped = false;
         }
     }
 
+    /// <summary>
+    /// Logic for when the path is clear
+    /// The enemy moves toward the player and attacks when within stopping distance
+    /// </summary>
     void HandleChasePath()
     {
         agent.isStopped = false;
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
+        //stoppingDistance tem que ser menor que o attack range
         if (distanceToPlayer <= agent.stoppingDistance)
         {
             AttemptAttack(playerTransform.gameObject);
         }
     }
 
+    /// <summary>
+    /// Trigger for the attack. Checks if the cooldown is ready
+    /// </summary>
     void AttemptAttack(GameObject target)
     {
         if (!isAttacking)
@@ -100,6 +124,9 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Coroutine that handles the attack timing, damage application, and cooldown
+    /// </summary>
     IEnumerator AttackRoutine(GameObject target)
     {
         isAttacking = true;
@@ -112,24 +139,41 @@ public class EnemyAI : MonoBehaviour
             if (targetHealth != null)
             {
                 targetHealth.TakeDamage(stats.Damage);
+                Debug.Log("HIT BARRIER!");
                 //anim.SetTrigger("Attack")
             }
+            else
+            {
+                EntityStats playerStats = target.GetComponent<EntityStats>();
+                if (playerStats != null)
+                {
+                    playerStats.TakeDamage(stats.Damage);
+                    Debug.Log("HIT PLAYER!");
+                }
+            }
+            
         }
 
         yield return new WaitForSeconds(attackCooldown);
         isAttacking = false;
-        agent.isStopped = false;
+        agent.isStopped = false; //Resume movement
     }
 
+    /// <summary>
+    /// Public method to trigger a knocback effect from projectiles or explosions
+    /// </summary>
     public void ApplyKnockback(Vector3 initialPosition, float force)
     {
         if (gameObject.activeInHierarchy) //If the enemy has died
         {
-            StopAllCoroutines(); //Interrupts the previous knockback
+            StopAllCoroutines(); //Reset any ongoing attack or previous knockback
             StartCoroutine(ApplyKnockbackRoutine(initialPosition, force));
         }
     }
 
+    /// <summary>
+    /// Coroutine that moves the agent backwards and handles friction
+    /// </summary>
     IEnumerator ApplyKnockbackRoutine(Vector3 shotDirection, float force)
     {
         isKnockedback = true;
@@ -140,6 +184,7 @@ public class EnemyAI : MonoBehaviour
 
         float currentForce = force;
 
+        //Gradually reduce the force over time until it's insignificant
         while (currentForce > 0.2f)
         {
             agent.Move(direction * currentForce * Time.deltaTime);
@@ -152,14 +197,9 @@ public class EnemyAI : MonoBehaviour
         agent.isStopped = false; 
     }
 
-    void UpdateDestination()
-    {
-        if (playerTransform != null)
-        {
-            agent.SetDestination(playerTransform.position);
-        }
-    }
-
+    /// <summary>
+    /// Visualizes the attack range in the Unity Editor for easier debugging
+    /// </summary>
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

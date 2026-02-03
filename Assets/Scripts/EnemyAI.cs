@@ -8,6 +8,7 @@ public class EnemyAI : MonoBehaviour
     private NavMeshAgent agent;
     private Transform playerTransform;
     private EntityStats stats;
+    private CharacterAnimationController anim;
 
     [Header("Enemy Settings")]
     [SerializeField] private float attackRange;
@@ -24,6 +25,7 @@ public class EnemyAI : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         stats = GetComponent<EntityStats>();
+        anim = GetComponentInChildren<CharacterAnimationController>();
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null) playerTransform = player.transform;
@@ -140,7 +142,7 @@ public class EnemyAI : MonoBehaviour
             {
                 targetHealth.TakeDamage(stats.Damage);
                 Debug.Log("HIT BARRIER!");
-                //anim.SetTrigger("Attack")
+                anim.PlayAttack();
             }
             else
             {
@@ -149,6 +151,7 @@ public class EnemyAI : MonoBehaviour
                 {
                     playerStats.TakeDamage(stats.Damage);
                     Debug.Log("HIT PLAYER!");
+                    anim.PlayAttack();
                 }
             }
             

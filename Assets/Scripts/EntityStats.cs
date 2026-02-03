@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 public class EntityStats : MonoBehaviour
 {
     [SerializeField] private EntityStatsData data;
-
+    private CharacterAnimationController anim;
 
     //Variáveis locais para permitir modificadores sem alterar o ScriptableObject
     private float maxHp;
@@ -35,6 +35,10 @@ public class EntityStats : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        anim = GetComponent<CharacterAnimationController>();
+    }
     public void SetupEnemyStats(float hpMod, float speedMod)
     {
         maxHp = data.MaxHp * hpMod;
@@ -54,7 +58,10 @@ public class EntityStats : MonoBehaviour
         if(IsDead) return;
 
         CurrentHp -= damage;
-        OnHealthChanged?.Invoke();
+
+        if (CurrentHp > 0 && CompareTag("Enemy")) anim.PlayHit();
+
+        if (CompareTag("Player")) OnHealthChanged?.Invoke(); //Notifies the UIManager
 
         if(kbForce > 0 && TryGetComponent<EnemyAI>(out EnemyAI ai))
         {
@@ -63,7 +70,9 @@ public class EntityStats : MonoBehaviour
 
          if (CurrentHp <= 0)
          {
-            if(CompareTag("Enemy"))
+            anim.PlayDeath();
+
+            if (CompareTag("Enemy"))
             {
                 GlobalEvents.OnEnemyKilled?.Invoke();
 
@@ -79,6 +88,6 @@ public class EntityStats : MonoBehaviour
     void Death()
     {
         IsDead = true;  
-        Destroy(gameObject);
+        Destroy(gameObject,1);
     }
 }

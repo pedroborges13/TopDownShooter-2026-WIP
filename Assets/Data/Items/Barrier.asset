@@ -15,5 +15,5 @@ MonoBehaviour:
   displayName: Barrier
   price: 50
   prefab: {fileID: 6599635712563957990, guid: 5937b83973af10b48abaff1408b64b80, type: 3}
-  previewPrefab: {fileID: 886518032279016992, guid: eb8b9f4cd6ccb6e4094f8d64967096f1, type: 3}
+  previewPrefab: {fileID: 9109581986889262327, guid: eb8b9f4cd6ccb6e4094f8d64967096f1, type: 3}
   size: {x: 1, y: 1}

@@ -5,10 +5,10 @@ using UnityEngine.AI;
 public class EnemyAI : MonoBehaviour
 {
     [Header("References")]
-    private NavMeshAgent agent;
-    private Transform playerTransform;
     private EntityStats stats;
     private CharacterAnimationController anim;
+    private NavMeshAgent agent;
+    private Transform playerTransform;
 
     [Header("Enemy Settings")]
     [SerializeField] private float attackRange;
@@ -23,9 +23,10 @@ public class EnemyAI : MonoBehaviour
     private bool isKnockedback;
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
         stats = GetComponent<EntityStats>();
         anim = GetComponentInChildren<CharacterAnimationController>();
+        agent = GetComponent<NavMeshAgent>();
+
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null) playerTransform = player.transform;
@@ -180,8 +181,14 @@ public class EnemyAI : MonoBehaviour
     IEnumerator ApplyKnockbackRoutine(Vector3 shotDirection, float force)
     {
         isKnockedback = true;
-        agent.isStopped = true; //Stops persuits
 
+        if(agent == null || !agent.enabled || !agent.isOnNavMesh)
+        {
+            isKnockedback = false;
+            yield break; //Stop coroutine
+        }
+
+        agent.isStopped = true; //Stops persuits
         Vector3 direction = shotDirection.normalized;
         direction.y = 0; //Ensures knockback is only horizontal
 
@@ -190,14 +197,16 @@ public class EnemyAI : MonoBehaviour
         //Gradually reduce the force over time until it's insignificant
         while (currentForce > 0.2f)
         {
-            agent.Move(direction * currentForce * Time.deltaTime);
+            if(agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.Move(direction * currentForce * Time.deltaTime);
+            }
             currentForce = Mathf.Lerp(currentForce, 0, friction * Time.deltaTime);
-
             yield return null;
         }
 
         isKnockedback = false;
-        agent.isStopped = false; 
+        if(agent != null && agent.enabled) agent.isStopped = false; 
     }
 
     /// <summary>
@@ -207,5 +216,11 @@ public class EnemyAI : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        if (agent != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, agent.stoppingDistance);
+        }
     }
 }

@@ -15,8 +15,15 @@ public class WeaponData : ScriptableObject
     [SerializeField] private float knockbackForce;
     [SerializeField] private float projectileSpeed;
     [SerializeField] private bool isAutomatic;
-
     [SerializeField] private int price;
+
+    [Header("Projectile Behaviour")]
+    [SerializeField] private int projPerShot;
+    [SerializeField] private int pierceCount;
+    [SerializeField] private float spreadAngle;
+
+    
+
     //Visuals
     public string WeaponName => weaponName;
     public GameObject ModelPrefab => modelPrefab;
@@ -28,6 +35,11 @@ public class WeaponData : ScriptableObject
     public float KnockbackForce => knockbackForce;
     public float ProjectileSpeed => projectileSpeed;
     public bool IsAutomatic => isAutomatic;
-
     public int Price => price;
+
+    //Projectile Behaviour
+    public int ProjPerShot => projPerShot;
+    public int PierceCount => pierceCount;
+    public float SpreadAngle => spreadAngle;
+
 }

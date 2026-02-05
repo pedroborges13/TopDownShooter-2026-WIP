@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
         //Normalizes the vector to 1 to limit the speed
         Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f)
+        if (direction.magnitude >= 0.1f && controller.enabled)
         {
             controller.Move(direction * currentSpeed * Time.deltaTime);
         }

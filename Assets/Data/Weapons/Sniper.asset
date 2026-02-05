@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f276f54a5c74734dbb1d30b24a028b3, type: 3}
-  m_Name: Pistol
+  m_Name: Sniper
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Pistol
+  weaponName: Sniper
   modelPrefab: {fileID: 0}
   projectilePrefab: {fileID: 3917754564542185514, guid: 96119a04a9f1d9446bd717767a64bb8f, type: 3}
-  damage: 2
-  fireRateRPM: 150
-  knockbackForce: 1.5
-  projectileSpeed: 10
+  damage: 10
+  fireRateRPM: 20
+  knockbackForce: 2
+  projectileSpeed: 20
   isAutomatic: 0
-  price: 0
+  price: 1500
   projPerShot: 1
-  pierceCount: 1
+  pierceCount: 3
   spreadAngle: 0

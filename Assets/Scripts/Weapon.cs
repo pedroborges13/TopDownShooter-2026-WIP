@@ -10,11 +10,6 @@ public class Weapon : MonoBehaviour
     private float fireTime;
 
     public bool IsAutomatic => weaponData.IsAutomatic;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
 
     public int GetPrice()
     {
@@ -41,13 +36,15 @@ public class Weapon : MonoBehaviour
 
     void Shoot()
     {
-        GameObject newProj = Instantiate(weaponData.ProjectilePrefab, muzzlePoint.position, muzzlePoint.rotation);
+        for (int i = 0; i < weaponData.ProjPerShot; i++)
+        {
+            float horizontalSpread = Random.Range(-weaponData.SpreadAngle, weaponData.SpreadAngle);
+            float verticalSpread = Random.Range(-weaponData.SpreadAngle, weaponData.SpreadAngle);
+            Quaternion spreadRotation = Quaternion.Euler(horizontalSpread, verticalSpread, 0);
 
-        newProj.GetComponent<Projectile>().Setup(weaponData);
-    }
+            GameObject newProj = Instantiate(weaponData.ProjectilePrefab, muzzlePoint.position, muzzlePoint.rotation * spreadRotation);
 
-    void OnDestroy()
-    {
-
+            newProj.GetComponent<Projectile>().Setup(weaponData);
+        }
     }
 }

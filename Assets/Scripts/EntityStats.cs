@@ -7,6 +7,8 @@ public class EntityStats : MonoBehaviour
 {
     [SerializeField] private EntityStatsData data;
     private CharacterAnimationController anim;
+    private NavMeshAgent agent;
+    private CharacterController playerController;
 
     //Variáveis locais para permitir modificadores sem alterar o ScriptableObject
     private float maxHp;
@@ -38,6 +40,8 @@ public class EntityStats : MonoBehaviour
     void Start()
     {
         anim = GetComponent<CharacterAnimationController>();
+        if (CompareTag("Enemy")) agent = GetComponent<NavMeshAgent>();
+        else if (CompareTag("Player")) playerController = GetComponent<CharacterController>();
     }
     public void SetupEnemyStats(float hpMod, float speedMod)
     {
@@ -59,35 +63,46 @@ public class EntityStats : MonoBehaviour
 
         CurrentHp -= damage;
 
-        if (CurrentHp > 0 && CompareTag("Enemy")) anim.PlayHit();
-
-        if (CompareTag("Player")) OnHealthChanged?.Invoke(); //Notifies the UIManager
-
-        if(kbForce > 0 && TryGetComponent<EnemyAI>(out EnemyAI ai))
+        if (kbForce > 0 && TryGetComponent<EnemyAI>(out EnemyAI ai))
         {
             ai.ApplyKnockback(initialPosition, kbForce);
         }
 
-         if (CurrentHp <= 0)
-         {
-            anim.PlayDeath();
+        if (CurrentHp > 0) anim.PlayHit();
 
-            if (CompareTag("Enemy"))
-            {
-                GlobalEvents.OnEnemyKilled?.Invoke();
+        if (CompareTag("Player")) OnHealthChanged?.Invoke(); //Notifies the UIManager
 
-                if (TryGetComponent<EnemyDrop>(out EnemyDrop drop))
-                {
-                    drop.DropReward();
-                }
-            }
-            Death();
+        if (CurrentHp <= 0)
+        {
+           anim.PlayDeath();
+
+           if (CompareTag("Enemy"))
+           {
+               GlobalEvents.OnEnemyKilled?.Invoke();
+               DisableNavMesh();
+
+               if (TryGetComponent<EnemyDrop>(out EnemyDrop drop))
+               {
+                   drop.DropReward();
+               }   
+           }
+           Death();
          }
     }
 
+    void DisableNavMesh()
+    {
+        if(agent != null)
+        {
+            agent.speed = 0;
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+    }
     void Death()
     {
         IsDead = true;  
+        if(CompareTag("Player")) playerController.enabled = false;
         Destroy(gameObject,1);
     }
 }

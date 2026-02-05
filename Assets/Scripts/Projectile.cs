@@ -10,6 +10,7 @@ public class Projectile : MonoBehaviour
     //Internal variables to store data from WeaponData
     private float damage;
     private float knockback;
+    private int currentPierce;
 
     void Awake()
     {
@@ -23,7 +24,8 @@ public class Projectile : MonoBehaviour
     public void Setup(WeaponData data)
     {
         damage = data.Damage;
-        knockback = data.KnockbackForce;    
+        knockback = data.KnockbackForce;  
+        currentPierce = data.PierceCount;
 
         rb.linearVelocity = transform.forward * data.ProjectileSpeed;
     }
@@ -34,7 +36,14 @@ public class Projectile : MonoBehaviour
         {
             other.GetComponent<EntityStats>().TakeDamage(damage, transform.forward, knockback);
 
-            Destroy(gameObject);
+            if(currentPierce <= 0)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                currentPierce--; //Loses 1 "pierce" when passing through an enemy
+            }
         }
     }
 }

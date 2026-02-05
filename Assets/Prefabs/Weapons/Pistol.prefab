@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   weaponData: {fileID: 11400000, guid: e00b4d44ef15d754395bb5575214d7bd, type: 2}
-  muzzlePoint: {fileID: 4544999132337221357}
+  muzzlePoint: {fileID: 0}
 --- !u!1 &2925476157173778048
 GameObject:
   m_ObjectHideFlags: 0

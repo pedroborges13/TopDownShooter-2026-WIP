@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
   displayName: Barrier
   price: 50
-  prefab: {fileID: 9113172467910725948, guid: 2f4bec94dd89d8d4dbf8506292bffdc8, type: 3}
-  previewPrefab: {fileID: 8869239041365727139, guid: 1e9e8630642de814e9d2514fa09dfc08, type: 3}
+  prefab: {fileID: 6599635712563957990, guid: 5937b83973af10b48abaff1408b64b80, type: 3}
+  previewPrefab: {fileID: 886518032279016992, guid: eb8b9f4cd6ccb6e4094f8d64967096f1, type: 3}
   size: {x: 1, y: 1}

@@ -39,7 +39,7 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (isKnockedback || playerTransform == null) return;
+        if (isKnockedback || playerTransform == null || stats.IsDead) return;
 
         //Debug.Log($"Status: {agent.pathStatus} | Velocity: {agent.velocity.sqrMagnitude}");
 

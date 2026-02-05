@@ -5,11 +5,10 @@ public class Projectile : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float lifeTime;
-    private float projDamage;
     private Rigidbody rb;
+
     //Internal variables to store data from WeaponData
     private float damage;
-    //private float speed;
     private float knockback;
 
     void Awake()

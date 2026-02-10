@@ -1,18 +1,25 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class ExplosiveBarrel : MonoBehaviour
+public class ExplosiveBarrel : ExplosiveBase
 {
-    [SerializeField] private GameObject explosionPrefab;
-    private bool hasExploded = false;
+    [Header("Stats")]
+    [SerializeField] private float maxHp;
 
-    public void TriggerExplosion()
+    private float currentHp;
+
+    public float MaxHp => maxHp;
+
+    void Start()
+    {
+        currentHp = MaxHp;
+    }
+    public void TakeDamage(float damage)
     {
         if (hasExploded) return;
-        hasExploded = true;
 
-        GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-        explosion.GetComponent<Explosion>().Setup(8f, 200f, 40f);
+        currentHp -= damage;
 
-        Destroy(gameObject);
+        if(currentHp <= 0) TriggerExplosion();
     }
 }

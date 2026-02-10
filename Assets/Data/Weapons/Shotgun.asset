@@ -18,9 +18,11 @@ MonoBehaviour:
   damage: 1.25
   fireRateRPM: 50
   knockbackForce: 1
-  projectileSpeed: 15
+  projectileSpeed: 100
   isAutomatic: 0
   price: 1000
+  magazineSize: 5
+  reloadTime: 5
   projPerShot: 6
-  pierceCount: 1
+  pierceCount: 0
   spreadAngle: 15

@@ -1,29 +1,30 @@
+using System.Collections.Generic;
+using Unity.Profiling;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
     [Header("Explosion Settings")]
-    [SerializeField] private float radius;
-    [SerializeField] private float maxDamage;
-    [SerializeField] private float knockbackForce;
     [SerializeField] private LayerMask targetLayer;
+    private float radius;
+    private float maxDamage;
+    private float knockbackForce;
 
     [Header("VFX")]
     [SerializeField] private float vfxDuration;
 
-    void Start()
-    {
-        Explode();
-
-        Destroy(gameObject, vfxDuration);
-    }
+    //List to avoid multiple damage in object with multiple colliders
+    private List<GameObject> objectsDamaged = new List<GameObject>();
 
     public void Setup(float newRadius, float newDamage, float newKnockback)
     {
         radius = newRadius;
         maxDamage = newDamage;  
         knockbackForce = newKnockback;
+
+        Explode();
+        Destroy(gameObject, vfxDuration);
     }
 
     void Explode()
@@ -33,6 +34,9 @@ public class Explosion : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
+            if (objectsDamaged.Contains(hit.gameObject) || (hit.transform.parent != null && objectsDamaged.Contains(hit.transform.parent.gameObject))) continue;
+            objectsDamaged.Add(hit.gameObject);
+
             //Distance between the explosion and target
             float distance = Vector3.Distance(transform.position, hit.transform.position);
 
@@ -42,25 +46,27 @@ public class Explosion : MonoBehaviour
 
             float finalDamage = maxDamage * damagePercent;
 
-            if (finalDamage < 1f) continue;
+            if (finalDamage < 0.5f) continue; //If damage is low, ignore it
 
             //Knockback direction (from explosion center to enemy)
-            Vector3 knockbackDir = (hit.transform.position - hit.transform.position).normalized;
+            Vector3 knockbackDir = (hit.transform.position - transform.position).normalized;
             knockbackDir.y = 0; //Stays at ground
 
             if (hit.TryGetComponent<EntityStats>(out EntityStats stats))
             {
-                stats.TakeDamage(finalDamage, knockbackDir, knockbackForce * damagePercent);    
+                stats.TakeDamage(finalDamage, knockbackDir, knockbackForce * damagePercent);
+                Debug.Log($"<color=orange>EXPLOSÃO:</color> {hit.name} recebeu {finalDamage.ToString("F2")} de dano.");
+                Debug.Log($"{hit.name} currentHp: {stats.CurrentHp}");
             }
 
             if (hit.TryGetComponent<BarrierHealth>(out BarrierHealth barrier))
             {
                 barrier.TakeDamage(finalDamage);
             }
-            /* if (hit.TryGetComponent<ExplosiveBarrel>(out ExplosiveBarrel otherBarrel))
+            if (hit.TryGetComponent<ExplosiveBarrel>(out ExplosiveBarrel otherBarrel))
             {
                 otherBarrel.TriggerExplosion();
-            }*/
+            }
         }
     }
 

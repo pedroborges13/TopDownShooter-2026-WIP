@@ -125,6 +125,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   weaponData: {fileID: 11400000, guid: a7cd554514b885e4ba0051278a755a97, type: 2}
   muzzlePoint: {fileID: 3007544680208055966}
+  muzzleFlashPrefab: {fileID: 1743301284569550, guid: ad2ab49d0a2a17148bd51c93d977bdbc, type: 3}
+  muzzleFlashDuration: 0.05
 --- !u!4 &588593463147314498 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 59c4b7eab4ecf1441b0fe86e69ebf25a, type: 3}

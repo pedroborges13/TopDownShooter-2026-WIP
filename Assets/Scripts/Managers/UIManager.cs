@@ -1,6 +1,8 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,9 +13,20 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject pauseScreen;
     [SerializeField] private GameObject gameOverScreen;
 
+    [Header("Weapon HUD")]
+    [SerializeField] private TextMeshProUGUI weaponNameText;
+    [SerializeField] private TextMeshProUGUI ammoText;
+    [SerializeField] private Image reloadFillImage;
+    [SerializeField] private GameObject reloadGroup;
+
+
     void OnEnable()
     {
         PlayerWallet.OnMoneyChanged += UpdateMoneyText; //Must subscribe in OnEnable to get PlayerWallet Start() value
+
+        Weapon.OnWeaponEquipped += UpdateWeaponName;
+        Weapon.OnAmmoChanged += UpdateAmmoText;
+        Weapon.OnReloadStart += StartReloadVisual;
 
         if (GameManager.Instance != null) SubscribeToGameManager();
     }
@@ -79,8 +92,54 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    void UpdateWeaponName(string name)
+    {
+        weaponNameText.text = name;
+
+        if (reloadGroup != null) reloadGroup.SetActive(false);
+        reloadFillImage.fillAmount = 0;
+    }
+
+    void UpdateAmmoText(int current, int max)
+    {
+        ammoText.text = $"{current}/{max}";
+
+        if (current == 0) ammoText.color = Color.red;
+        else ammoText.color = Color.white;
+    }
+
+    void StartReloadVisual(float duration)
+    {
+        StopCoroutine(nameof(ReloadAnimationRoutine));
+        StartCoroutine(ReloadAnimationRoutine(duration));
+    }
+
+    IEnumerator ReloadAnimationRoutine(float duration)
+    {
+        if(reloadGroup != null) reloadGroup.SetActive(true);
+        reloadFillImage.fillAmount = 0;
+
+        float timer = 0;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            reloadFillImage.fillAmount = timer / duration;
+            yield return null;
+        }
+
+        reloadFillImage.fillAmount = 1;
+
+        yield return new WaitForSeconds(0.2f);
+        if (reloadGroup != null) reloadGroup.SetActive(false);
+    }
+
     void OnDisable()
     {
+        Weapon.OnWeaponEquipped -= UpdateWeaponName;
+        Weapon.OnAmmoChanged -= UpdateAmmoText;
+        Weapon.OnReloadStart -= StartReloadVisual;
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnWaveChanged -= UpdateWaveText;

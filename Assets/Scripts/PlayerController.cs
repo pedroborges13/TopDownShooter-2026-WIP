@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
@@ -78,6 +79,12 @@ public class PlayerController : MonoBehaviour
 
     void PlayerShootingInput()
     {
+        //Doesn't shoot when interacting with UI elements
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
+        //Doesn't shoot in building mode
+        if (BuildManager.Instance != null && BuildManager.Instance.IsBuildingMode) return;
+
         Weapon activeWeapon = inventory.GetCurrentWeapon();
         if (activeWeapon == null) return;
 

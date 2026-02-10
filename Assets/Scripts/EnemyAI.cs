@@ -189,6 +189,7 @@ public class EnemyAI : MonoBehaviour
         }
 
         agent.isStopped = true; //Stops persuits
+
         Vector3 direction = shotDirection.normalized;
         direction.y = 0; //Ensures knockback is only horizontal
 
@@ -204,6 +205,9 @@ public class EnemyAI : MonoBehaviour
             currentForce = Mathf.Lerp(currentForce, 0, friction * Time.deltaTime);
             yield return null;
         }
+
+        //Time for the enemy to recover from being shot before walking again
+        yield return new WaitForSeconds(0.2f); 
 
         isKnockedback = false;
         if(agent != null && agent.enabled) agent.isStopped = false; 

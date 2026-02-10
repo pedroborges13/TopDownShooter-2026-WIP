@@ -17,6 +17,10 @@ public class WeaponData : ScriptableObject
     [SerializeField] private bool isAutomatic;
     [SerializeField] private int price;
 
+    [Header("Reloading")]
+    [SerializeField] private int magazineSize;
+    [SerializeField] private float reloadTime;
+
     [Header("Projectile Behaviour")]
     [SerializeField] private int projPerShot;
     [SerializeField] private int pierceCount;
@@ -36,6 +40,8 @@ public class WeaponData : ScriptableObject
     public float ProjectileSpeed => projectileSpeed;
     public bool IsAutomatic => isAutomatic;
     public int Price => price;
+    public int MagazineSize => magazineSize;    
+    public float ReloadTime => reloadTime;    
 
     //Projectile Behaviour
     public int ProjPerShot => projPerShot;

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79741e7074c003949b4751f1fbc55109, type: 3}
+  m_Name: ExplosiveBarrel
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  displayName: ExplosiveBarrel
+  price: 500
+  prefab: {fileID: 7883913805192234147, guid: 4587432ab33cf0f458f70871881e2533, type: 3}
+  previewPrefab: {fileID: 1197031688785872741, guid: 04912f48233577747ba2a60c0aef3bd0, type: 3}
+  size: {x: 1, y: 1}

@@ -45,5 +45,11 @@ public class Projectile : MonoBehaviour
                 currentPierce--; //Loses 1 "pierce" when passing through an enemy
             }
         }
+        
+        if (other.CompareTag("ExplosiveBarrel"))
+        {
+            other.GetComponent<ExplosiveBarrel>().TakeDamage(damage);
+            Destroy(gameObject);
+        }
     }
 }

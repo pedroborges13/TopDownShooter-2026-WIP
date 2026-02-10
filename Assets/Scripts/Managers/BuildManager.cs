@@ -25,6 +25,8 @@ public class BuildManager : MonoBehaviour
     //Events
     public event Action<int> OnBuildingPlaced;
 
+    public bool IsBuildingMode => isBuildingMode;
+
     void Awake()
     {
         if (Instance == null) Instance = this;

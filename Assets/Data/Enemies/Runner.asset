@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EntityStatsData
   entityName: Runner
   maxHp: 6
-  moveSpeed: 3
+  moveSpeed: 3.5
   damage: 1

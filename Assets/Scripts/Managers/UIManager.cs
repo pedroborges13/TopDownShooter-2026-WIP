@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI ammoText;
     [SerializeField] private Image reloadFillImage;
     [SerializeField] private GameObject reloadGroup;
+    private Coroutine currentReloadCoroutine; //Stores reference to the active coroutine
 
 
     void OnEnable()
@@ -92,10 +93,17 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    // --- WEAPON HUD ---
+    // ----- WEAPON HUD -----
     void UpdateWeaponName(string name)
     {
         weaponNameText.text = name;
+
+        //Stops the old coroutine when switching weapons
+        if (currentReloadCoroutine != null)
+        {
+            StopCoroutine(currentReloadCoroutine);  
+            currentReloadCoroutine = null;
+        }
 
         //Reset reload visuals when switching weapons
         if (reloadGroup != null) reloadGroup.SetActive(false);
@@ -112,8 +120,13 @@ public class UIManager : MonoBehaviour
 
     void StartReloadVisual(float reloadTime)
     {
-        StopCoroutine(nameof(ReloadAnimationRoutine)); //Stops the previous coroutine before starting new one
-        StartCoroutine(ReloadAnimationRoutine(reloadTime));
+        if (currentReloadCoroutine != null) StopCoroutine(currentReloadCoroutine); //Stops the previous coroutine before starting new one
+
+        //Reset reload visuals
+        reloadFillImage.fillAmount = 0;
+        if (reloadGroup != null) reloadGroup.SetActive(true);
+
+        currentReloadCoroutine = StartCoroutine(ReloadAnimationRoutine(reloadTime)); //Starts new coroutine and saves the reference
     }
 
     IEnumerator ReloadAnimationRoutine(float reloadTime)
@@ -136,9 +149,11 @@ public class UIManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
         if (reloadGroup != null) reloadGroup.SetActive(false);
+
+        currentReloadCoroutine = null; //Clears the reference
     }
 
-    //-------------------
+    //--------------------------
 
     void OnDisable()
     {

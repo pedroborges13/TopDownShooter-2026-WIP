@@ -26,6 +26,11 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float spawnRate;
     [SerializeField] private float spawnBetweenGroups;
 
+    [Header("Runner Progression")]
+    [SerializeField] private float initialRunnerChance;
+    [SerializeField] private float runnerChanceIncrease;
+    [SerializeField] private int runnerIncreaseInterval;
+
     //Control
     private float hpMod = 1f;
     private float speedMod = 1f;
@@ -50,35 +55,48 @@ public class WaveManager : MonoBehaviour
 
     public void StartWave(int waveNumber)
     {
+        //----- DIFICULT SCALING -----
         //Every 5 waves, increase enemy health modifier
         if (waveNumber > 1 && waveNumber % 5 == 0)
         {
             hpMod += 0.4f;
         }
 
-        //Total groups (Base 2 + 1 every 3 rounds)
+        //----- ENEMY COUNT LOGIC -----
+        //Total groups: (Base 2 + 1 every 3 rounds)
         int totalGroups = 2 + Mathf.FloorToInt(waveNumber / 3f);
 
-        //Enemies per group (Base 5 + 2 every 4 rounds)
+        //Enemies per group: (Base 5 + 2 every 4 rounds)
         int enemiesPerGroup = 5 + (Mathf.FloorToInt(waveNumber / 4f) * 2);
 
-        //Runner enemy spawn chance starting at round 5
-        float runnerChance = 0f;
-        if(waveNumber > 5)
+        //----- RUNNER ENEMY SPAWN LOGIC -----
+        //Runner enemy spawn chance
+        float currentRunnerChance = initialRunnerChance;
+
+        if(waveNumber > 1)
         {
-            runnerChance = 0.5f;
+            //Counts how many full 2-round cycles have passed
+            int increases = (waveNumber - 1) / runnerIncreaseInterval;
+
+            //Apply the increase
+            currentRunnerChance += (increases * runnerChanceIncrease);
         }
 
+        //Ensures the chance is never less than 0 or bigger than 1 (100%)
+        currentRunnerChance = Mathf.Clamp01(currentRunnerChance);
+        Debug.Log($"Wave {waveNumber}: Chance de Runner é de {currentRunnerChance * 100}%");
+
+        // ----- TOTAL CALCULATION -----
         //Calculate total enemies for the wave
         totalEnemies = (totalGroups * enemiesPerGroup);
-        if (waveNumber > 1 && waveNumber % 5 == 0) totalEnemies += 1; //+1 do Boss
+        if (waveNumber > 1 && waveNumber % 5 == 0) totalEnemies += 1; //+1 from Boss
 
         enemiesKilled = 0;
 
         Debug.Log($"Iniciando Wave {waveNumber}: {totalEnemies} inimigos totais.");
         //OnWaveStarted?
 
-        StartCoroutine(SpawnProceduralRoutine(totalGroups, enemiesPerGroup, runnerChance, waveNumber));
+        StartCoroutine(SpawnProceduralRoutine(totalGroups, enemiesPerGroup, currentRunnerChance, waveNumber));
     }
 
    
@@ -120,13 +138,14 @@ public class WaveManager : MonoBehaviour
         if (prefab == null) return; 
 
         Transform selectedPoint = spawnPoints[pointIndex];
-        GameObject enemy = Instantiate(prefab, selectedPoint.position, Quaternion.identity);
+        Vector3 randomOffset = new Vector3(Random.Range(-0.05f, 0.5f), 0, Random.Range(-0.05f, 0.5f)); //Small position variation to prevent them from spawning too close together
+        GameObject enemy = Instantiate(prefab, selectedPoint.position + randomOffset, Quaternion.identity);
 
         //Apply difficulty buffs via EntityStats
-        if (enemy.TryGetComponent<EntityStats>(out EntityStats stats)) //TryGetComponent é melhor para performance, faz tudo em uma operacao só comparado ao GetComponent.
+        if (enemy.TryGetComponent<EntityStats>(out EntityStats stats)) //TryGetComponent performs a single operation (better performance than GetComponent + null check)
         {
-            stats.SetupEnemyStats(hpMod, speedMod); //Pega o metodo publico do EntityStats
-            //Debug.Log($"HP {stats.MaxHp}, Velocidade {stats.MoveSpeed}");
+            stats.SetupEnemyStats(hpMod, speedMod); //Accesses EntityStats public method
+            //Debug.Log($"HP {stats.MaxHp}, Speed {stats.MoveSpeed}");
         }
     }
 

@@ -2320,6 +2320,9 @@ MonoBehaviour:
   - {fileID: 1294696081}
   spawnRate: 2
   spawnBetweenGroups: 5
+  initialRunnerChance: 0
+  runnerChanceIncrease: 0.1
+  runnerIncreaseInterval: 2
 --- !u!4 &731720178
 Transform:
   m_ObjectHideFlags: 0

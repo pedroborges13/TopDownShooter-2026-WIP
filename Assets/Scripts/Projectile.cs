@@ -8,6 +8,10 @@ public class Projectile : MonoBehaviour
     private Rigidbody rb;
     private TrailRenderer trail;
 
+    [Header("VFX")]
+    [SerializeField] private GameObject bloodPrefab;
+    [SerializeField] private float vfxDuration;
+
     //Internal variables to store data from WeaponData
     private float damage;
     private float knockback;
@@ -45,6 +49,14 @@ public class Projectile : MonoBehaviour
             transform.position = hit.point;
             rb.linearVelocity = Vector3.zero;
             ProcessCollision(hit.collider);
+
+            //VFX
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                GameObject newBlood = Instantiate(bloodPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+                newBlood.transform.parent = hit.transform;
+                Destroy(newBlood, vfxDuration);
+            }
         }
     }
 
@@ -61,6 +73,8 @@ public class Projectile : MonoBehaviour
             else
             {
                 currentPierce--; //Loses 1 "pierce" when passing through an enemy
+                rb.linearVelocity = transform.forward * speed;
+                transform.position += transform.forward * 0.1f;
             }
         }
 
@@ -73,6 +87,7 @@ public class Projectile : MonoBehaviour
 
     void StopProjectileVisually()
     {
+        rb.linearVelocity = Vector3.zero;
         if (trail != null) trail.emitting = false;
 
         MeshRenderer mesh = GetComponent<MeshRenderer>();

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EntityStatsData
   entityName: Boss
   maxHp: 30
-  moveSpeed: 2
+  moveSpeed: 2.5
   damage: 2

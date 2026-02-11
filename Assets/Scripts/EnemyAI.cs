@@ -31,10 +31,17 @@ public class EnemyAI : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null) playerTransform = player.transform;
 
-        //Apply movement speed from SO/Stats to the NavMeshAgent
         if (stats != null && agent != null)
         {
-            agent.speed = stats.MoveSpeed;
+            //Random values to give each enemy unique behaviour
+            agent.speed = stats.MoveSpeed * Random.Range(0.8f,1.2f); //Apply movement speed from SO/Stats to the NavMeshAgent
+            agent.avoidancePriority = Random.Range(30, 70); //Low priority: enemy avoids no one (others avoid it). High priority: enemy avoids everyone to prevent collisions.
+            agent.acceleration = agent.acceleration * Random.Range(0.8f, 1.4f); 
+            agent.angularSpeed = Random.Range(450, 750); //Rotation speed
+            
+            float minStop = attackRange * 0.6f; 
+            float maxStop = attackRange * 0.9f; 
+            agent.stoppingDistance = Random.Range(minStop, maxStop);
         } 
     }
 
@@ -49,7 +56,7 @@ public class EnemyAI : MonoBehaviour
         if (pathTimer >= updateInterval)
         {
             agent.SetDestination(playerTransform.position);
-            pathTimer = 0;
+            pathTimer = Random.Range(0f, updateInterval);
         }
 
         //If currently performing an attack animation/routine, skip movement logic

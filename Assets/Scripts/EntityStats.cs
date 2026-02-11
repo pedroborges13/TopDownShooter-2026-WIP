@@ -85,6 +85,10 @@ public class EntityStats : MonoBehaviour
                {
                    drop.DropReward();
                }   
+               if (TryGetComponent<BoxCollider>(out BoxCollider collider))
+               {
+                    collider.enabled = false;
+               }
            }
            Death();
          }

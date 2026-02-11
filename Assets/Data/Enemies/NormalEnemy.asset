@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EntityStatsData
   entityName: NormalEnemy
   maxHp: 6
-  moveSpeed: 1
+  moveSpeed: 1.5
   damage: 1

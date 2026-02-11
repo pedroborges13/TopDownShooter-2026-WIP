@@ -154,7 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7d09cfcdc181f64fb64cdf756dfdefd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  lifeTime: 2
+  lifeTime: 1
+  bloodPrefab: {fileID: 519265189813625459, guid: de19c1b5789228d4cadc5ae6b337ae0b, type: 3}
+  vfxDuration: 0.2
 --- !u!96 &-2636448493021425099
 TrailRenderer:
   serializedVersion: 3

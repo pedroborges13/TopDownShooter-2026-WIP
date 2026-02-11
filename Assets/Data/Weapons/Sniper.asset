@@ -21,8 +21,8 @@ MonoBehaviour:
   projectileSpeed: 80
   isAutomatic: 0
   price: 1500
-  magazineSize: 4
-  reloadTime: 5
+  magazineSize: 5
+  reloadTime: 3.5
   projPerShot: 1
   pierceCount: 3
   spreadAngle: 0

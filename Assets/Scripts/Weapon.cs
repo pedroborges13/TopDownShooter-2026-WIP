@@ -34,8 +34,6 @@ public class Weapon : MonoBehaviour
 
     void Start()
     {
-        PlayerController.OnWeaponReloaded += Reload;
-
         currentAmmo = weaponData.MagazineSize;
 
         //Pistol
@@ -48,9 +46,11 @@ public class Weapon : MonoBehaviour
         return weaponData.Price;
     }
     public void OnEquip()
-    {
+    {   
         gameObject.SetActive(true);
         isReloading = false;
+
+        PlayerController.OnWeaponReloaded += Reload;
 
         OnWeaponEquipped?.Invoke(weaponData.WeaponName);
         OnAmmoChanged?.Invoke(currentAmmo, weaponData.MagazineSize);
@@ -58,6 +58,8 @@ public class Weapon : MonoBehaviour
 
     public void OnUnequip()
     {
+        PlayerController.OnWeaponReloaded -= Reload;
+
         gameObject.SetActive(false);
         StopAllCoroutines(); //Stops reload if player switches weapons
         isReloading = false;
@@ -133,10 +135,5 @@ public class Weapon : MonoBehaviour
 
             Destroy(flash, muzzleFlashDuration);
         }
-    }
-
-    void OnDestroy()
-    {
-        PlayerController.OnWeaponReloaded -= Reload;
     }
 }

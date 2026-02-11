@@ -15,6 +15,9 @@ public class Weapon : MonoBehaviour
     [SerializeField] private GameObject muzzleFlashPrefab;
     [SerializeField] private float muzzleFlashDuration;
 
+    [Header("Aim Layer")]
+    [SerializeField] private LayerMask aimLayerMask;
+
     private float fireTime;
     private int currentAmmo;
     private bool isReloading;
@@ -31,7 +34,13 @@ public class Weapon : MonoBehaviour
 
     void Start()
     {
+        PlayerController.OnWeaponReloaded += Reload;
+
         currentAmmo = weaponData.MagazineSize;
+
+        //Pistol
+        OnWeaponEquipped?.Invoke(weaponData.WeaponName);
+        OnAmmoChanged?.Invoke(currentAmmo, weaponData.MagazineSize);
     }
 
     public int GetPrice()
@@ -50,7 +59,7 @@ public class Weapon : MonoBehaviour
     public void OnUnequip()
     {
         gameObject.SetActive(false);
-        StopAllCoroutines();
+        StopAllCoroutines(); //Stops reload if player switches weapons
         isReloading = false;
     }
 
@@ -60,7 +69,7 @@ public class Weapon : MonoBehaviour
 
         if (currentAmmo <= 0)
         {
-            StartCoroutine(ReloadRoutine());
+            Reload();
             return;
         }
 
@@ -77,16 +86,31 @@ public class Weapon : MonoBehaviour
         OnAmmoChanged?.Invoke(currentAmmo, weaponData.MagazineSize);
         SpawnMuzzleFlash();
 
+        //The animations were shaking the rotation too much, so it was necessary to base it on the player's rotation
+        Quaternion playerRotation = transform.root.rotation;
+
         for (int i = 0; i < weaponData.ProjPerShot; i++)
         {
+            //Calculate random spread based on weapon data
             float horizontalSpread = Random.Range(-weaponData.SpreadAngle, weaponData.SpreadAngle);
             float verticalSpread = Random.Range(-weaponData.SpreadAngle, weaponData.SpreadAngle);
             Quaternion spreadRotation = Quaternion.Euler(horizontalSpread, verticalSpread, 0);
 
-            GameObject newProj = Instantiate(weaponData.ProjectilePrefab, muzzlePoint.position, muzzlePoint.rotation * spreadRotation);
+            //Combine the stable player rotation with the randomized spred
+            Quaternion finalRotarion = playerRotation * spreadRotation;
+
+            //Instantiate the projectile at the muzzle position, but using the stabilized rotation
+            GameObject newProj = Instantiate(weaponData.ProjectilePrefab, muzzlePoint.position, finalRotarion);
 
             newProj.GetComponent<Projectile>().Setup(weaponData);
         }
+    }
+
+    void Reload()
+    {
+        if (currentAmmo >= weaponData.MagazineSize) return;
+
+        StartCoroutine(ReloadRoutine());
     }
 
     IEnumerator ReloadRoutine()
@@ -109,5 +133,10 @@ public class Weapon : MonoBehaviour
 
             Destroy(flash, muzzleFlashDuration);
         }
+    }
+
+    void OnDestroy()
+    {
+        PlayerController.OnWeaponReloaded -= Reload;
     }
 }

@@ -18,7 +18,7 @@ MonoBehaviour:
   damage: 10
   fireRateRPM: 20
   knockbackForce: 2
-  projectileSpeed: 100
+  projectileSpeed: 80
   isAutomatic: 0
   price: 1500
   magazineSize: 4

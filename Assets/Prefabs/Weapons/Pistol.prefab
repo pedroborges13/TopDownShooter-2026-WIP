@@ -69,7 +69,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b864856a0413fbe428970f6cd748d462, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.052335896
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b864856a0413fbe428970f6cd748d462, type: 3}
       propertyPath: m_LocalRotation.y
@@ -77,7 +77,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b864856a0413fbe428970f6cd748d462, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 1
+      value: 0.9986295
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b864856a0413fbe428970f6cd748d462, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -85,7 +85,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b864856a0413fbe428970f6cd748d462, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b864856a0413fbe428970f6cd748d462, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -132,3 +132,6 @@ MonoBehaviour:
   muzzlePoint: {fileID: 9088845807462973926}
   muzzleFlashPrefab: {fileID: 1743301284569550, guid: ad2ab49d0a2a17148bd51c93d977bdbc, type: 3}
   muzzleFlashDuration: 0.05
+  aimLayerMask:
+    serializedVersion: 2
+    m_Bits: 0

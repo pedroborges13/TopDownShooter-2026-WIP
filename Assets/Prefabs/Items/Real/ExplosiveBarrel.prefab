@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 3002855625765850519}
   m_Layer: 3
   m_Name: ExplosiveBarrel
-  m_TagString: Untagged
+  m_TagString: ExplosiveBarrel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -152,12 +152,12 @@ NavMeshObstacle:
   m_GameObject: {fileID: 7883913805192234147}
   m_Enabled: 1
   serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.005, y: 0.005, z: 0.014}
+  m_Shape: 0
+  m_Extents: {x: 0.2, y: 1, z: 0.2}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0.014}
+  m_Center: {x: -0.02, y: 1.15, z: -0.02}
   m_TimeToStationary: 0.1
 --- !u!65 &3002855625765850519
 BoxCollider:

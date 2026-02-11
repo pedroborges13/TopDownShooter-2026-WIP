@@ -91,11 +91,13 @@ public class UIManager : MonoBehaviour
             gameOverScreen.SetActive(false);
         }
     }
-
+    
+    // --- WEAPON HUD ---
     void UpdateWeaponName(string name)
     {
         weaponNameText.text = name;
 
+        //Reset reload visuals when switching weapons
         if (reloadGroup != null) reloadGroup.SetActive(false);
         reloadFillImage.fillAmount = 0;
     }
@@ -104,27 +106,29 @@ public class UIManager : MonoBehaviour
     {
         ammoText.text = $"{current}/{max}";
 
-        if (current == 0) ammoText.color = Color.red;
+        if (current == 0) ammoText.color = Color.red; //Visual feedback: change colour when bullets are running out 
         else ammoText.color = Color.white;
     }
 
-    void StartReloadVisual(float duration)
+    void StartReloadVisual(float reloadTime)
     {
-        StopCoroutine(nameof(ReloadAnimationRoutine));
-        StartCoroutine(ReloadAnimationRoutine(duration));
+        StopCoroutine(nameof(ReloadAnimationRoutine)); //Stops the previous coroutine before starting new one
+        StartCoroutine(ReloadAnimationRoutine(reloadTime));
     }
 
-    IEnumerator ReloadAnimationRoutine(float duration)
+    IEnumerator ReloadAnimationRoutine(float reloadTime)
     {
         if(reloadGroup != null) reloadGroup.SetActive(true);
         reloadFillImage.fillAmount = 0;
 
         float timer = 0;
 
-        while (timer < duration)
+        while (timer < reloadTime)
         {
             timer += Time.deltaTime;
-            reloadFillImage.fillAmount = timer / duration;
+
+            //Fills from 0 to 1 based on time percentage
+            reloadFillImage.fillAmount = timer / reloadTime;
             yield return null;
         }
 
@@ -133,6 +137,8 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         if (reloadGroup != null) reloadGroup.SetActive(false);
     }
+
+    //-------------------
 
     void OnDisable()
     {

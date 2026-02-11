@@ -127,6 +127,9 @@ MonoBehaviour:
   muzzlePoint: {fileID: 2503300318515229380}
   muzzleFlashPrefab: {fileID: 1743301284569550, guid: ad2ab49d0a2a17148bd51c93d977bdbc, type: 3}
   muzzleFlashDuration: 0.05
+  aimLayerMask:
+    serializedVersion: 2
+    m_Bits: 201
 --- !u!4 &6818012404951515647 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e30af2241eb4f724586d464eba183f9d, type: 3}

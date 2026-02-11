@@ -5,19 +5,21 @@ using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private CharacterController controller;
-    //[SerializeField] private Weapon currentWeapon;
-    private float currentSpeed;
-
-    //Layer
-    [SerializeField] private LayerMask groundLayer;
-
-    //References
     EntityStats stats;
     Inventory inventory;
+    private float currentSpeed;
+
+    [Header("Layer")]
+    [SerializeField] private LayerMask aimLayer;
+
+    //Mouse position
+    private Vector3 mouseWorldPosition;
 
     //Events
     public static event Action OnShootPressed;
+    public static event Action OnWeaponReloaded;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -35,6 +37,7 @@ public class PlayerController : MonoBehaviour
         PlayerShootingInput();  
         HandleWeaponInput();
         PauseGame();
+        Reload();
     }
 
     void PlayerMove()
@@ -59,7 +62,7 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
 
         //Checks if the ray hit the ground
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, aimLayer))
         {
             //Gets the point where the mouse touched the ground
             Vector3 targetPosition = hit.point;
@@ -117,6 +120,14 @@ public class PlayerController : MonoBehaviour
         if (scroll > 0f) inventory.NextWeapon();
         if (scroll < 0f) inventory.PreviousWeapon();
 
+    }
+
+    void Reload()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            OnWeaponReloaded?.Invoke();
+        }
     }
 
     void PauseGame()

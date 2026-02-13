@@ -845,6 +845,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   attackRange: 0.9
   attackCooldown: 2
+  isBoss: 0
   friction: 8
   updateInterval: 0.3
 --- !u!114 &8936550493851218488
@@ -859,6 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90778df99c38e5b458d2f4e2a99cb5de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
+  canReceiveKnockback: 1
   data: {fileID: 11400000, guid: 81be271d7e137954f9545123bb826630, type: 2}
 --- !u!114 &8199334901079264776
 MonoBehaviour:

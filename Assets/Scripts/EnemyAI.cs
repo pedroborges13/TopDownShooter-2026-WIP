@@ -4,6 +4,10 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
+    public enum State { Chasing, Attacking, Knockback, Dead}
+    [Header("State Machine")]
+    [SerializeField] private State currentState;
+
     [Header("References")]
     private EntityStats stats;
     private CharacterAnimationController anim;
@@ -13,14 +17,13 @@ public class EnemyAI : MonoBehaviour
     [Header("Enemy Settings")]
     [SerializeField] private float attackRange;
     [SerializeField] private float attackCooldown;
-    private bool isAttacking;
+    [SerializeField] private bool isBoss;
+    private bool canAttack;
 
     [SerializeField] private float friction; //Adjustment for how quiclky the enemy stops
     [SerializeField] private float updateInterval; //Interval to avoid overloading the CPU
     private float pathTimer;
-
-    //State
-    private bool isKnockedback;
+    private GameObject currentBarrierTarget;
     void Start()
     {
         stats = GetComponent<EntityStats>();
@@ -31,7 +34,7 @@ public class EnemyAI : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null) playerTransform = player.transform;
 
-        if (stats != null && agent != null)
+        if (stats != null && agent != null && !isBoss)
         {
             //Random values to give each enemy unique behaviour
             agent.speed = stats.MoveSpeed * Random.Range(0.8f,1.2f); //Apply movement speed from SO/Stats to the NavMeshAgent
@@ -42,23 +45,57 @@ public class EnemyAI : MonoBehaviour
             float minStop = attackRange * 0.7f; 
             float maxStop = attackRange * 0.9f; 
             agent.stoppingDistance = Random.Range(minStop, maxStop);
-        } 
+        }
+
+        canAttack = true;
+        SwitchState(State.Chasing);
     }
 
     void Update()
     {
-        if (isKnockedback || playerTransform == null || stats.IsDead) return;
+        if (currentState == State.Dead || stats.IsDead || playerTransform == null) return;
 
-        //Debug.Log($"Status: {agent.pathStatus} | Velocity: {agent.velocity.sqrMagnitude}");
-
-        //If attacking: Only rotates to follow the player, then exit
-        //Prevents the enemy from standing like a statue if the player moves around it during the attack
-        if (isAttacking) 
+        switch (currentState)
         {
-            FaceTarget();
-            return;
-        }
+            case State.Chasing:
+                HandleMovementLogic();
+                break;
 
+            case State.Attacking:
+                FaceTarget(); //If attacking: Only rotates to follow the player, then exit. Prevents the enemy from standing like a statue if the player moves around it during the attack
+                break;
+            case State.Knockback:
+                break;
+
+        }
+    }
+
+    void SwitchState(State newState)
+    {
+        currentState = newState;
+        
+        switch (currentState)
+        {
+            case State.Chasing:
+                agent.isStopped = false;
+                break;
+            case State.Attacking:
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+                break;
+            case State.Knockback:
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+                break;
+            case State.Dead:
+                agent.isStopped = true;
+                agent.enabled = false;
+                break;
+        }
+    }
+
+    void HandleMovementLogic()
+    {
         //Optimization: Recalculate the path to the player only at specific intervals
         pathTimer += Time.deltaTime;
         if (pathTimer >= updateInterval)
@@ -77,6 +114,8 @@ public class EnemyAI : MonoBehaviour
         {
             HandleChasePath();
         }
+
+        //Debug.Log($"Status: {agent.pathStatus} | Velocity: {agent.velocity.sqrMagnitude}");
     }
 
     /// <summary>
@@ -85,30 +124,36 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     void HandleBlockedPath()
     {
-        Debug.Log("Caminho bloqueado, procurando barrier");
+        //Maintain current target if still valid
+        if (currentBarrierTarget != null)
+        {
+            float dist = Vector3.Distance(transform.position, currentBarrierTarget.transform.position);
+            if(dist <= attackRange)
+            {
+                AttemptAttack(currentBarrierTarget);
+                return;
+            }
+            else currentBarrierTarget = null; //Target out of range. Search for new target
+        }
 
         //Detect all coliders within the attack range
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
-        bool barrierFound = false;
+        GameObject bestBarrier = null;
+        float lowestHealth = float.MaxValue;
 
         foreach (var hit in hitColliders)
         {
-            if (hit.CompareTag("Barrier"))
+            if (hit.CompareTag("Barrier") && hit.TryGetComponent<BarrierHealth>(out BarrierHealth barrier))
             {
-            //Stop the agent to attack
-            agent.isStopped = true;
-            AttemptAttack(hit.gameObject);
-            barrierFound = true;
-            Debug.Log("Atacou a Barrier");
-            break; //Focus on one barrier at a time
+                if (barrier.CurrentHp < lowestHealth)
+                {
+                lowestHealth = barrier.CurrentHp;   
+                bestBarrier = hit.gameObject;
+                }
             }
         }
 
-        //If no barries is nearby, resume movement
-        if (!barrierFound)
-        {
-        agent.isStopped = false;
-        }
+        if (bestBarrier != null ) AttemptAttack(bestBarrier);
     }
 
     /// <summary>
@@ -122,14 +167,10 @@ public class EnemyAI : MonoBehaviour
         //stoppingDistance must be less than attackRange
         if (distanceToPlayer <= agent.stoppingDistance || distanceToPlayer <= attackRange)
         {
-            agent.isStopped = true; //Stops movement
-            agent.velocity = Vector3.zero; //Resets velocity/inertia to prevent sliding
-
             FaceTarget(); //Looks at the player before attacking
 
             AttemptAttack(playerTransform.gameObject);
         }
-        else agent.isStopped = false; //If out of range, resume movement 
     }
 
     /// <summary>
@@ -137,7 +178,7 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     void AttemptAttack(GameObject target)
     {
-        if (!isAttacking)
+        if (canAttack && currentState == State.Chasing)
         {
             StartCoroutine(AttackRoutine(target));
         }
@@ -148,8 +189,8 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     IEnumerator AttackRoutine(GameObject target)
     {
-        isAttacking = true;
-        agent.isStopped = true;
+        SwitchState(State.Attacking);
+        canAttack = false;
 
         if (target != null)
         {
@@ -174,9 +215,17 @@ public class EnemyAI : MonoBehaviour
             
         }
 
-        yield return new WaitForSeconds(attackCooldown);
-        isAttacking = false;
-        agent.isStopped = false; //Resume movement
+        yield return new WaitForSeconds(0.5f);
+
+        if (currentState != State.Dead && currentState != State.Knockback)
+        {
+            SwitchState(State.Chasing);
+        }
+
+        float remainingCooldown = attackCooldown - 0.5f;
+        if (remainingCooldown > 0) yield return new WaitForSeconds(remainingCooldown);
+
+        canAttack = true;
     }
 
     /// <summary>
@@ -184,9 +233,9 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     void FaceTarget()
     {
-        if (playerTransform != null) return;
+        if (playerTransform == null) return;
         
-        Vector3 direction = (playerTransform.position - playerTransform.position).normalized;
+        Vector3 direction = (playerTransform.position - transform.position).normalized;
         direction.y = 0;
 
         if (direction != Vector3.zero)
@@ -203,11 +252,10 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     public void ApplyKnockback(Vector3 initialPosition, float force)
     {
-        if (gameObject.activeInHierarchy) //If the enemy has died
-        {
-            StopAllCoroutines(); //Reset any ongoing attack or previous knockback
-            StartCoroutine(ApplyKnockbackRoutine(initialPosition, force));
-        }
+        if (stats.IsDead) return;
+
+        StopAllCoroutines(); //Reset any ongoing attack or previous knockback
+        StartCoroutine(ApplyKnockbackRoutine(initialPosition, force));
     }
 
     /// <summary>
@@ -215,15 +263,13 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     IEnumerator ApplyKnockbackRoutine(Vector3 shotDirection, float force)
     {
-        isKnockedback = true;
+        SwitchState(State.Knockback);
 
         if(agent == null || !agent.enabled || !agent.isOnNavMesh)
         {
-            isKnockedback = false;
+            SwitchState(State.Chasing);
             yield break; //Stop coroutine
         }
-
-        agent.isStopped = true; //Stops persuits
 
         Vector3 direction = shotDirection.normalized;
         direction.y = 0; //Ensures knockback is only horizontal
@@ -242,10 +288,9 @@ public class EnemyAI : MonoBehaviour
         }
 
         //Time for the enemy to recover from being shot before walking again
-        yield return new WaitForSeconds(0.2f); 
+        yield return new WaitForSeconds(0.2f);
 
-        isKnockedback = false;
-        if(agent != null && agent.enabled) agent.isStopped = false; 
+        if (!stats.IsDead) SwitchState(State.Chasing);
     }
 
     /// <summary>

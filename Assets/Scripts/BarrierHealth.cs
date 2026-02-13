@@ -3,21 +3,21 @@ using UnityEngine;
 public class BarrierHealth : MonoBehaviour
 {
     [SerializeField] private float maxHp;
-    private float currentHp;
 
     public float MaxHp => maxHp;
+    public float CurrentHp {  get; private set; }   
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currentHp = MaxHp;
+        CurrentHp = MaxHp;
     }
 
     public void TakeDamage(float damage)
     {
-        currentHp -= damage;
+        CurrentHp -= damage;
 
-        if(currentHp <= 0)
+        if(CurrentHp <= 0)
         {
             Death();
         }

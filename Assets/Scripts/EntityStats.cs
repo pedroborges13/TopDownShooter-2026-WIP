@@ -5,12 +5,15 @@ using UnityEngine.Rendering;
 
 public class EntityStats : MonoBehaviour
 {
+    [SerializeField] private bool canReceiveKnockback;
     [SerializeField] private EntityStatsData data;
+
+    //References
     private CharacterAnimationController anim;
     private NavMeshAgent agent;
     private CharacterController playerController;
 
-    //Variáveis locais para permitir modificadores sem alterar o ScriptableObject
+    //Local variables allow modifications without altering the ScriptableObject
     private float maxHp;
     private float moveSpeed;
 
@@ -65,10 +68,10 @@ public class EntityStats : MonoBehaviour
 
         if (kbForce > 0 && TryGetComponent<EnemyAI>(out EnemyAI ai))
         {
-            ai.ApplyKnockback(initialPosition, kbForce);
+            if(canReceiveKnockback) ai.ApplyKnockback(initialPosition, kbForce);
         }
 
-        if (CurrentHp > 0) anim.PlayHit();
+        if (CurrentHp > 0 && canReceiveKnockback) anim.PlayHit();
 
         if (CompareTag("Player")) OnHealthChanged?.Invoke(); //Notifies the UIManager
 

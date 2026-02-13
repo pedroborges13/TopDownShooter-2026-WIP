@@ -16,8 +16,8 @@ public class UIManager : MonoBehaviour
     [Header("Weapon HUD")]
     [SerializeField] private TextMeshProUGUI weaponNameText;
     [SerializeField] private TextMeshProUGUI ammoText;
+    [SerializeField] private GameObject reloadHUD;
     [SerializeField] private Image reloadFillImage;
-    [SerializeField] private GameObject reloadGroup;
     private Coroutine currentReloadCoroutine; //Stores reference to the active coroutine
 
 
@@ -37,10 +37,15 @@ public class UIManager : MonoBehaviour
         if (GameManager.Instance != null) SubscribeToGameManager(); //GameManager events trigger in Start(), causing subscription conflict in OnEnable
     }
 
-    void SubscribeToGameManager() 
+    void Update()
+    {
+        if (reloadHUD != null && reloadHUD.activeSelf) FollowMouseCursor();
+    }
+
+    void SubscribeToGameManager()
     {
         //Prevents duplication if OnEnable() subscription works
-        GameManager.Instance.OnWaveChanged -= UpdateWaveText; 
+        GameManager.Instance.OnWaveChanged -= UpdateWaveText;
         GameManager.Instance.OnGamePhaseChanged -= UpdateGamePhaseUI;
         GameManager.Instance.OnGameStatusChanged -= UpdateGameStatusUI;
 
@@ -58,18 +63,18 @@ public class UIManager : MonoBehaviour
 
     void UpdateMoneyText(int currentMoney)
     {
-       moneyText.text = "$: " + currentMoney.ToString();
+        moneyText.text = "$: " + currentMoney.ToString();
     }
 
     void UpdateGamePhaseUI(GamePhase newPhase)
     {
         if (newPhase == GamePhase.Preparation)
         {
-            preparationUI.SetActive(true);  
+            preparationUI.SetActive(true);
         }
         else if (newPhase == GamePhase.Combat)
         {
-            preparationUI.SetActive(false); 
+            preparationUI.SetActive(false);
         }
 
     }
@@ -86,13 +91,13 @@ public class UIManager : MonoBehaviour
             pauseScreen.SetActive(false);
             gameOverScreen.SetActive(true);
         }
-        else 
+        else
         {
             pauseScreen.SetActive(false);
             gameOverScreen.SetActive(false);
         }
     }
-    
+
     // ----- WEAPON HUD -----
     void UpdateWeaponName(string name)
     {
@@ -101,12 +106,12 @@ public class UIManager : MonoBehaviour
         //Stops the old coroutine when switching weapons
         if (currentReloadCoroutine != null)
         {
-            StopCoroutine(currentReloadCoroutine);  
+            StopCoroutine(currentReloadCoroutine);
             currentReloadCoroutine = null;
         }
 
         //Reset reload visuals when switching weapons
-        if (reloadGroup != null) reloadGroup.SetActive(false);
+        if (reloadHUD != null) reloadHUD.SetActive(false);
         reloadFillImage.fillAmount = 0;
     }
 
@@ -124,15 +129,16 @@ public class UIManager : MonoBehaviour
 
         //Reset reload visuals
         reloadFillImage.fillAmount = 0;
-        if (reloadGroup != null) reloadGroup.SetActive(true);
+        if (reloadHUD != null) reloadHUD.SetActive(true);
 
         currentReloadCoroutine = StartCoroutine(ReloadAnimationRoutine(reloadTime)); //Starts new coroutine and saves the reference
     }
 
     IEnumerator ReloadAnimationRoutine(float reloadTime)
     {
-        if(reloadGroup != null) reloadGroup.SetActive(true);
+        if (reloadHUD != null) reloadHUD.SetActive(true);
         reloadFillImage.fillAmount = 0;
+        Cursor.visible = false;
 
         float timer = 0;
 
@@ -148,9 +154,16 @@ public class UIManager : MonoBehaviour
         reloadFillImage.fillAmount = 1;
 
         yield return new WaitForSeconds(0.2f);
-        if (reloadGroup != null) reloadGroup.SetActive(false);
+        if (reloadHUD != null) reloadHUD.SetActive(false);
+        Cursor.visible = true;
 
         currentReloadCoroutine = null; //Clears the reference
+    }
+
+    void FollowMouseCursor()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        reloadHUD.transform.position = mousePos;
     }
 
     //--------------------------

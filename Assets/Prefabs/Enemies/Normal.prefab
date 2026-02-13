@@ -97,7 +97,7 @@ MonoBehaviour:
   attackRange: 0.9
   attackCooldown: 2
   friction: 8
-  updateInterval: 0.3
+  updateInterval: 0.1
 --- !u!114 &7473962413423924734
 MonoBehaviour:
   m_ObjectHideFlags: 0

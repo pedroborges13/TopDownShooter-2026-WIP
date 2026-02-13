@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
     {
         CurrentPhase = GamePhase.Preparation;
         OnGamePhaseChanged?.Invoke(CurrentPhase);
-        Debug.Log($"GameState: {CurrentPhase}");
+        //Debug.Log($"GameState: {CurrentPhase}");
         prepTime = defaultPrepTime;
     }
 

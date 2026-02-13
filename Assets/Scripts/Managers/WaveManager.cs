@@ -138,7 +138,7 @@ public class WaveManager : MonoBehaviour
         if (prefab == null) return; 
 
         Transform selectedPoint = spawnPoints[pointIndex];
-        Vector3 randomOffset = new Vector3(Random.Range(-0.05f, 0.5f), 0, Random.Range(-0.05f, 0.5f)); //Small position variation to prevent them from spawning too close together
+        Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)); //Small position variation to prevent them from spawning too close together
         GameObject enemy = Instantiate(prefab, selectedPoint.position + randomOffset, Quaternion.identity);
 
         //Apply difficulty buffs via EntityStats

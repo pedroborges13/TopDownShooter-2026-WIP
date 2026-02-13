@@ -23,6 +23,7 @@ public class CharacterAnimationController : MonoBehaviour
     void Update()
     {
         if (stats != null && stats.IsDead) return;
+        if (Time.deltaTime <= Mathf.Epsilon) return; //Required check: Time.deltTime is 0 when paused, which breaks run animation calculations
 
         //Get the current position
         Vector3 currentPosition = transform.position;

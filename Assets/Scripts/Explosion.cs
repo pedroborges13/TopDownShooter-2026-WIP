@@ -32,17 +32,24 @@ public class Explosion : MonoBehaviour
         //OverlapSphere(Vector3 position, float radius, int layerMask)
         Collider[] hits = Physics.OverlapSphere(transform.position, radius, targetLayer);
 
+        float innerRadius = radius * 0.3f; //Damage fallof starts here (30% of radius). Full damage zone: 0% to 30% of explosion radius
+
         foreach (Collider hit in hits)
         {
             if (objectsDamaged.Contains(hit.gameObject) || (hit.transform.parent != null && objectsDamaged.Contains(hit.transform.parent.gameObject))) continue;
             objectsDamaged.Add(hit.gameObject);
 
             //Distance between the explosion and target
-            float distance = Vector3.Distance(transform.position, hit.transform.position);
+            Vector3 closestPoint = hit.ClosestPoint(transform.position);
+            float distance = Vector3.Distance(transform.position, closestPoint);
 
-            //Falloff Calculation.Mathf.Clamp01 ensures the value stays between 0 and 1 (0% to 100%)
-            //If distance is 0, percent is 1. If distance equals radius, percent is 0.
-            float damagePercent = Mathf.Clamp01(1 - (distance/radius));
+            //InverseLerp(A, B, value) maps distance to a 0-1 range between innerRadius and radius
+            //If distance is less than innerRadius, result is 0
+            //If distance is equals radius, result is 1
+            float falloff = Mathf.InverseLerp(innerRadius, radius, distance);
+
+            //Converts 0 -> 100% damage and 1 -> 0% damage
+            float damagePercent = 1 - falloff;
 
             float finalDamage = maxDamage * damagePercent;
 
@@ -55,8 +62,7 @@ public class Explosion : MonoBehaviour
             if (hit.TryGetComponent<EntityStats>(out EntityStats stats))
             {
                 stats.TakeDamage(finalDamage, knockbackDir, knockbackForce * damagePercent);
-                Debug.Log($"<color=orange>EXPLOSÃO:</color> {hit.name} recebeu {finalDamage.ToString("F2")} de dano.");
-                Debug.Log($"{hit.name} currentHp: {stats.CurrentHp}");
+                Debug.Log($"<color=orange>EXPLOSION:</color> {hit.name} takes {finalDamage.ToString("F2")} of damage. CurrentHp: {stats.CurrentHp}. Distance from explosion point {distance:F2}m ");
             }
 
             if (hit.TryGetComponent<BarrierHealth>(out BarrierHealth barrier))

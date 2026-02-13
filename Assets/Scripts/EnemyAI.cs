@@ -39,7 +39,7 @@ public class EnemyAI : MonoBehaviour
             agent.acceleration = agent.acceleration * Random.Range(0.8f, 1.4f); 
             agent.angularSpeed = Random.Range(450, 750); //Rotation speed
             
-            float minStop = attackRange * 0.6f; 
+            float minStop = attackRange * 0.7f; 
             float maxStop = attackRange * 0.9f; 
             agent.stoppingDistance = Random.Range(minStop, maxStop);
         } 
@@ -51,6 +51,14 @@ public class EnemyAI : MonoBehaviour
 
         //Debug.Log($"Status: {agent.pathStatus} | Velocity: {agent.velocity.sqrMagnitude}");
 
+        //If attacking: Only rotates to follow the player, then exit
+        //Prevents the enemy from standing like a statue if the player moves around it during the attack
+        if (isAttacking) 
+        {
+            FaceTarget();
+            return;
+        }
+
         //Optimization: Recalculate the path to the player only at specific intervals
         pathTimer += Time.deltaTime;
         if (pathTimer >= updateInterval)
@@ -58,9 +66,6 @@ public class EnemyAI : MonoBehaviour
             agent.SetDestination(playerTransform.position);
             pathTimer = Random.Range(0f, updateInterval);
         }
-
-        //If currently performing an attack animation/routine, skip movement logic
-        if (isAttacking) return;
 
         //Path Status logic:
         //Patial Path means the NavMesh is blocked (likely by a Barrier)
@@ -112,15 +117,19 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     void HandleChasePath()
     {
-        agent.isStopped = false;
-
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
-        //stoppingDistance tem que ser menor que o attack range
-        if (distanceToPlayer <= agent.stoppingDistance)
+        //stoppingDistance must be less than attackRange
+        if (distanceToPlayer <= agent.stoppingDistance || distanceToPlayer <= attackRange)
         {
+            agent.isStopped = true; //Stops movement
+            agent.velocity = Vector3.zero; //Resets velocity/inertia to prevent sliding
+
+            FaceTarget(); //Looks at the player before attacking
+
             AttemptAttack(playerTransform.gameObject);
         }
+        else agent.isStopped = false; //If out of range, resume movement 
     }
 
     /// <summary>
@@ -169,6 +178,25 @@ public class EnemyAI : MonoBehaviour
         isAttacking = false;
         agent.isStopped = false; //Resume movement
     }
+
+    /// <summary>
+    /// Makes the enemy rotate quickly to face the player
+    /// </summary>
+    void FaceTarget()
+    {
+        if (playerTransform != null) return;
+        
+        Vector3 direction = (playerTransform.position - playerTransform.position).normalized;
+        direction.y = 0;
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 20); 
+        }
+    }
+    
 
     /// <summary>
     /// Public method to trigger a knocback effect from projectiles or explosions

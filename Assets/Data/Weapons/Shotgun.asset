@@ -16,7 +16,7 @@ MonoBehaviour:
   modelPrefab: {fileID: 0}
   projectilePrefab: {fileID: 3917754564542185514, guid: 96119a04a9f1d9446bd717767a64bb8f, type: 3}
   damage: 1.25
-  fireRateRPM: 50
+  fireRateRPM: 65
   knockbackForce: 1
   projectileSpeed: 80
   isAutomatic: 0

@@ -6,7 +6,6 @@ public class Landmine : ExplosiveBase
     {
         if (other.CompareTag("Enemy"))
         {
-            Debug.Log("Enemy detected");
             TriggerExplosion();
         }
     }
